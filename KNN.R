@@ -1,0 +1,154 @@
+#KNN Assignment
+library("gmodels")
+
+source('C:/Users/Bruger/Desktop/Statistical Mashine Learning/BaseFolder/loadImage.R', echo=TRUE)
+
+directory <- 'C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group';
+
+dataset <- loadSinglePersonsData(100,4,3,directory)
+dataset <- as.data.frame(dataset)
+
+normalize(dataset)
+
+datasetShuffle(dataset)
+
+#Data split 50-50
+train <- 1:2000
+data.train <- dataset_shuffle[train,-1]
+data.test <- dataset_shuffle[-train,-1]
+
+data.train.labels <- factor(dataset_shuffle[train,1])
+data.test.labels <- factor(dataset_shuffle[-train,1])
+
+####### Exercise 1.4.1 ######
+knn.model <- knn(data.train, data.test, data.train.labels,3)
+
+acc(knn.model, data.test.labels)
+###### Exercise 1.4.2 ######
+
+k <- 1:30
+speed <- list()
+accuracy_list <- list() 
+for (i in k){
+  time.start <- Sys.time()
+  model <- knn(data.train, data.test, data.train.labels,i)
+  time.end <- Sys.time()
+  
+  time.taken <- time.end - time.start
+
+  speed[i] <- time.taken
+  accuracy_list[i] <- acc(model, data.test.labels)
+  
+}
+plot(k,speed, xlab = "Number of K", ylab = "Time (seconds)")
+plot(k,accuracy_list, xlab = "Number of K", ylab = "Accuracy")
+#plot speed and accuracy
+
+###### Exercise 1.4.3 ######
+speed.cross <- list()
+folds <- createFolds(dataset, 10)
+accuracy_cross <- list()
+
+for(i in k){
+  for(j in folds){
+    cross.test <- dataset[folds[[j]],]
+    cross.train <- dataset[-folds[[j]],]
+    cross.train.labels <- dataset[-folds[[j]],1]
+    cross.test.labels <- dataset[folds[[j]],1]
+    
+    time.start <- Sys.time()
+    model <- knn(cross.train, cross.test, cross.train.labels,k)
+    time.end <- Sys.time()
+    
+    time.taken <- time.end - time.start
+    speed.cross[j] <- time.taken
+    
+    confusionMatrix(model, cross.test.labels) #get accuracy
+    #Mean of accuracy for specific k
+    accuracy_cross[j] <- 0 #accuracy
+    
+  }
+  speed.cross[i] <- mean(speed.cross)
+  accuracy_cross[i] <- mean(accuracy_cross)
+}
+
+#plot the speed.cross and accuracy_cross
+plot(k, speed.cross, xlab = "Number of K", ylab = "time (seconds)")
+plot(k, accuracy_cross, xlab = "Number of K", ylab = "Accuracy")
+
+###### Exercise 1.4.4 ######
+#Use a gaussian blur - gblur(image, sigma) -  OVERRIDE FREDERIK'S METHOD IN 'loadImage.R'!!!!!
+#Use a new dataset variable for the new blurred images
+
+
+dataset.gau <- loadSinglePersonsData(100,4,3,directory)
+dataset.gau <- data.frame(dataset)
+
+normalize(dataset.gau)
+
+datasetShuffle(dataset.gau)
+
+
+#do a cross validation again
+#use a number of k's
+speed.cross.gau <- list()
+folds <- createFolds(dataset.gau, 10)
+accuracy_cross.gau <- list()
+
+for(i in k){
+  for(j in folds){
+    cross.test.gau <- dataset.gau[folds[[j]],]
+    cross.train.gau <- dataset.gau[-folds[[j]],]
+    cross.train.gau.labels <- dataset.gau[-folds[[j]],1]
+    cross.test.gau.labels <- dataset.gau[folds[[j]],1]
+    
+    time.start <- Sys.time()
+    model <- knn(cross.train.gau, cross.test.gau, cross.train.gau.labels,k)
+    time.end <- Sys.time()
+    
+    time.taken <- time.end - time.start
+    speed.cross.gau[j] <- time.taken
+    
+    confusionMatrix(model, cross.test.gau.labels) #get accuracy
+    #Mean of accuracy for specific k
+    accuracy_cross.gau[j] <- 0 #accuracy
+    
+  }
+  speed.cross.gau[i] <- mean(speed.cross.gau)
+  accuracy_cross.gau[i] <- mean(accuracy_cross.gau)
+}
+
+#Plot the results
+plot(k, speed.cross.gau, xlab = "Number of K", ylab = "time (seconds)")
+plot(k, accuracy_cross.gau, xlab = "Number of K", ylab = "Accuracy")
+
+###### Exercise 1.4.5 ######
+#REMEBER TO UPDATE THE FOLDER
+#Use rExample.R
+
+directory.all <- 'C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group';
+
+datalist <- list(list)
+idlist <- getAllData(datalist)
+
+for(i in 1:length(idList)){
+  idTemp <- idList[i]
+  idTemp <- data.frame(idTemp)
+  dataset.all <- as.data.frame(rbind(id,idTemp))
+}
+
+normalize(dataset.all)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
