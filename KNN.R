@@ -14,11 +14,12 @@ datasetShuffle(dataset)
 
 #Data split 50-50
 train <- 1:2000
-data.train <- dataset_shuffle[train,-1]
-data.test <- dataset_shuffle[-train,-1]
 
-data.train.labels <- factor(dataset_shuffle[train,1])
-data.test.labels <- factor(dataset_shuffle[-train,1])
+data.train <- dataset[train,-1]
+data.test <- dataset[-train,-1]
+
+data.train.labels <- factor(dataset[train,1])
+data.test.labels <- factor(dataset[-train,1])
 
 ####### Exercise 1.4.1 ######
 knn.model <- knn(data.train, data.test, data.train.labels,3)
@@ -46,35 +47,44 @@ plot(k,accuracy_list, xlab = "Number of K", ylab = "Accuracy")
 
 ###### Exercise 1.4.3 ######
 speed.cross <- list()
-folds <- createFolds(dataset, 10)
+speed.cross.overall <- list()
+
+folds <- createFolds(dataset$V1, 10)
+
 accuracy_cross <- list()
+accuracy_cross.overall <- list()
+
+a <- list()
+s <- list()
 
 for(i in k){
-  for(j in folds){
-    cross.test <- dataset[folds[[j]],]
-    cross.train <- dataset[-folds[[j]],]
-    cross.train.labels <- dataset[-folds[[j]],1]
-    cross.test.labels <- dataset[folds[[j]],1]
+  for(j in 1:length(folds)){
+    cross.test <- dataset[folds[[j]],-1]
+    cross.train <- dataset[-folds[[j]],-1]
+    
+    cross.train.labels <- factor(dataset[-folds[[j]],1])
+    cross.test.labels <- factor(dataset[folds[[j]],1])
     
     time.start <- Sys.time()
     model <- knn(cross.train, cross.test, cross.train.labels,k)
     time.end <- Sys.time()
     
     time.taken <- time.end - time.start
-    speed.cross[j] <- time.taken
     
-    confusionMatrix(model, cross.test.labels) #get accuracy
-    #Mean of accuracy for specific k
-    accuracy_cross[j] <- 0 #accuracy
+    s[j] <- time.taken
+    a[j] <- acc(model, cross.test.labels) #accuracy
     
   }
-  speed.cross[i] <- mean(speed.cross)
-  accuracy_cross[i] <- mean(accuracy_cross)
+  speed.cross.overall[i] <- mean(s)
+  accuracy_cross.overall[i] <- mean(a)
+  
+  a <- 0
+  s <- 0
 }
 
 #plot the speed.cross and accuracy_cross
-plot(k, speed.cross, xlab = "Number of K", ylab = "time (seconds)")
-plot(k, accuracy_cross, xlab = "Number of K", ylab = "Accuracy")
+plot(k, speed.cross.overall, xlab = "Number of K", ylab = "time (seconds)")
+plot(k, accuracy_cross.overall, xlab = "Number of K", ylab = "Accuracy")
 
 ###### Exercise 1.4.4 ######
 #Use a gaussian blur - gblur(image, sigma) -  OVERRIDE FREDERIK'S METHOD IN 'loadImage.R'!!!!!

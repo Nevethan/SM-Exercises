@@ -7,7 +7,7 @@ normalize <- function(x) {
 
 #Dataset shuffle
 datasetShuffle <- function(dataset){
-  dataset <- dataset[sample(nrow(dataset)),]
+  return(dataset[sample(nrow(dataset)),])
 }
 
 #Method for Accuracy
@@ -53,4 +53,14 @@ confusionMatrix <- function(predicted_model,test_data){
   #return(con_result <- data.frame(Names, Values))
 }
 
-#
+
+
+
+
+
+
+
+
+
+
+
