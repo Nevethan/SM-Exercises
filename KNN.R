@@ -8,7 +8,7 @@ directory <- 'C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group';
 dataset <- loadSinglePersonsData(100,4,3,directory)
 dataset <- as.data.frame(dataset)
 
-normalize(dataset)
+#normalize(dataset)
 
 dataset <- datasetShuffle(dataset)
 
@@ -25,9 +25,10 @@ data.test.labels <- factor(dataset[-train,1])
 knn.model <- knn(data.train, data.test, data.train.labels,3)
 
 acc(knn.model, data.test.labels)
+
 ###### Exercise 1.4.2 ######
 
-k <- 1:30
+k <- 1:20
 speed <- list()
 accuracy_list <- list() 
 for (i in k){
@@ -41,6 +42,7 @@ for (i in k){
   accuracy_list[i] <- acc(model, data.test.labels)
   
 }
+
 plot(k,speed, xlab = "Number of K", ylab = "Time (seconds)")
 plot(k,accuracy_list, xlab = "Number of K", ylab = "Accuracy")
 #plot speed and accuracy
@@ -151,18 +153,33 @@ getAllData <- function(dataList){
 
 folder<- "C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group"
 
-datalist <- list(list(1), list(1,2), list(1,2,3), list(1,2,3), list(1,2,3,4,5), list(1,2,3), list(), list(1), list(1,2,3), list(1,2,3), list(1,2,3), list(1,2,3), list(1,2,3), list(1,2), list(1,2,3), list(1,2), list(1), list(1,2,3,4), list(1))
-idlist <- getAllData(datalist)
+datalist <- list(list(1), list(1,2,3), list(),list(1,2,3), list(), list(), list(), list(1), list(1), list(1,2,3), 
+                  list(), list(), list(), list(1,2), list(), list(1,2), list(1), list(), list(1,2,3))
+idList <- getAllData(datalist)
 
 for(i in 1:length(idList)){
   idTemp <- idList[i]
   idTemp <- data.frame(idTemp)
-  dataset.all <- as.data.frame(rbind(id,idTemp))
+  id <- as.data.frame(rbind(id,idTemp))
 }
 
+dataset.all <- as.data.frame(id)
 
+dataset.all <- datasetShuffle(dataset.all)
 
+train <- 1:40000
 
+dataset.all.train <- dataset.all[train,-1]
+dataset.all.test <- dataset.all[-train,-1]
+
+dataset.all.train.labels <- factor(dataset.all[train,1])
+dataset.all.test.labels <- factor(dataset.all[-train,1])
+
+model <- knn(dataset.all.train, dataset.all.test, dataset.all.train.labels, 5)
+
+a <- acc(model, dataset.all.test.labels)
+
+sd(a)
 
 
 

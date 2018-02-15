@@ -102,17 +102,17 @@ smoothImageOverride <- function(grayImg, sigma){
 loadSinglePersonsData <- function(DPI,groupNr,groupMemberNr,folder){
   #load the scaned images
 
-   ciffers <- list(readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-0.png"), collapse = "")),
-                    readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-1.png"), collapse = "")),
-                    readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-2.png"), collapse = "")),
-                    readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-3.png"), collapse = "")),
-                    readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-4.png"), collapse = "")))
+   # ciffers <- list(readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-0.png"), collapse = "")),
+   #                  readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-1.png"), collapse = "")),
+   #                  readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-2.png"), collapse = "")),
+   #                  readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-3.png"), collapse = "")),
+   #                  readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-4.png"), collapse = "")))
 
-   # ciffers <- list(readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-0.jpeg"), collapse = "")),
-   #                 readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-1.jpeg"), collapse = "")),
-   #                 readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-2.jpeg"), collapse = "")),
-   #                 readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-3.jpeg"), collapse = "")),
-   #                 readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-4.jpeg"), collapse = "")))
+   ciffers <- list(readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-0.jpeg"), collapse = "")),
+                   readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-1.jpeg"), collapse = "")),
+                   readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-2.jpeg"), collapse = "")),
+                   readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-3.jpeg"), collapse = "")),
+                   readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-4.jpeg"), collapse = "")))
   
   #load the corner values
   corners <- read.csv(paste(c(folder,groupNr,"/member",groupMemberNr,"/Corners.txt"), collapse = ""))
