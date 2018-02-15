@@ -10,7 +10,7 @@ dataset <- as.data.frame(dataset)
 
 normalize(dataset)
 
-datasetShuffle(dataset)
+dataset <- datasetShuffle(dataset)
 
 #Data split 50-50
 train <- 1:2000
@@ -66,7 +66,7 @@ for(i in k){
     cross.test.labels <- factor(dataset[folds[[j]],1])
     
     time.start <- Sys.time()
-    model <- knn(cross.train, cross.test, cross.train.labels,k)
+    model <- knn(cross.train, cross.test, cross.train.labels,i)
     time.end <- Sys.time()
     
     time.taken <- time.end - time.start
@@ -94,38 +94,36 @@ plot(k, accuracy_cross.overall, xlab = "Number of K", ylab = "Accuracy")
 dataset.gau <- loadSinglePersonsData(100,4,3,directory)
 dataset.gau <- data.frame(dataset)
 
-normalize(dataset.gau)
 
-datasetShuffle(dataset.gau)
+dataset.gau -> datasetShuffle(dataset.gau)
 
 
 #do a cross validation again
 #use a number of k's
 speed.cross.gau <- list()
-folds <- createFolds(dataset.gau, 10)
+folds <- createFolds(dataset.gau$V1, 10)
 accuracy_cross.gau <- list()
 
 for(i in k){
   for(j in folds){
-    cross.test.gau <- dataset.gau[folds[[j]],]
-    cross.train.gau <- dataset.gau[-folds[[j]],]
+    cross.test.gau <- dataset.gau[folds[[j]],-1]
+    cross.train.gau <- dataset.gau[-folds[[j]],-1]
+    
     cross.train.gau.labels <- dataset.gau[-folds[[j]],1]
     cross.test.gau.labels <- dataset.gau[folds[[j]],1]
     
     time.start <- Sys.time()
-    model <- knn(cross.train.gau, cross.test.gau, cross.train.gau.labels,k)
+    model <- knn(cross.train.gau, cross.test.gau, cross.train.gau.labels,i)
     time.end <- Sys.time()
     
     time.taken <- time.end - time.start
-    speed.cross.gau[j] <- time.taken
     
-    confusionMatrix(model, cross.test.gau.labels) #get accuracy
-    #Mean of accuracy for specific k
-    accuracy_cross.gau[j] <- 0 #accuracy
+    s[j] <- time.taken
+    a[j] <- acc(model, cross.test.gau.labels) #accuracy
     
   }
-  speed.cross.gau[i] <- mean(speed.cross.gau)
-  accuracy_cross.gau[i] <- mean(accuracy_cross.gau)
+  speed.cross.gau[i] <- mean(s)
+  accuracy_cross.gau[i] <- mean(a)
 }
 
 #Plot the results
@@ -134,11 +132,26 @@ plot(k, accuracy_cross.gau, xlab = "Number of K", ylab = "Accuracy")
 
 ###### Exercise 1.4.5 ######
 #REMEBER TO UPDATE THE FOLDER
-#Use rExample.R
+#REMEBER TO RUN METHOD - getAllData
 
-directory.all <- 'C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group';
+getAllData <- function(dataList){
+  id <- data.frame()
+  idList <- list()
+  for(i in 1:length(dataList))
+  {
+    if( length(dataList[[i]]) > 0  ){
+      for(j in 1:length(dataList[[i]])){
+        idTemp <- loadSinglePersonsData(100,i - 1,j,folder)
+        idList <- append(idList, list(idTemp))
+      }
+    }
+  }
+  return(idList)
+}
 
-datalist <- list(list)
+folder<- "C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group"
+
+datalist <- list(list(1), list(1,2), list(1,2,3), list(1,2,3), list(1,2,3,4,5), list(1,2,3), list(), list(1), list(1,2,3), list(1,2,3), list(1,2,3), list(1,2,3), list(1,2,3), list(1,2), list(1,2,3), list(1,2), list(1), list(1,2,3,4), list(1))
 idlist <- getAllData(datalist)
 
 for(i in 1:length(idList)){
@@ -147,7 +160,7 @@ for(i in 1:length(idList)){
   dataset.all <- as.data.frame(rbind(id,idTemp))
 }
 
-normalize(dataset.all)
+
 
 
 
