@@ -1,11 +1,11 @@
 #KNN Assignment
 library("gmodels")
 
-source('C:/Users/Bruger/Desktop/Statistical Mashine Learning/BaseFolder/loadImage.R', echo=TRUE)
+source('C:/Users/Bruger/Desktop/SM-Exercises/loadImage.R', echo=TRUE)
 
 directory <- 'C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group';
 
-dataset <- loadSinglePersonsData(100,4,3,directory)
+dataset <- loadSinglePersonsData(100,4,0,directory)
 dataset <- as.data.frame(dataset)
 
 #normalize(dataset)
@@ -155,6 +155,7 @@ folder<- "C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group"
 
 datalist <- list(list(1), list(1,2,3), list(),list(1,2,3), list(), list(), list(), list(1), list(1), list(1,2,3), 
                   list(), list(), list(), list(1,2), list(), list(1,2), list(1), list(), list(1,2,3))
+
 idList <- getAllData(datalist)
 
 for(i in 1:length(idList)){
@@ -165,9 +166,23 @@ for(i in 1:length(idList)){
 
 dataset.all <- as.data.frame(id)
 
-dataset.all <- datasetShuffle(dataset.all)
-
+#### IF YOU WANT TO DO THE EXERCISE ACCORDING TO INDIVIDUALS, THEN SPLIT THE DATA BEFORE SHUFFLING ####
+#### REMEMBER TO UNCOMMENT THE DATA SPLIT FOR INDIVIDUALS ####
 train <- 1:40000
+
+# data.train <- dataset.all[train,]
+# data.test <- dataset.all[-train,]
+# 
+# data.train <- datasetShuffle(data.train)
+# data.test <- datasetShuffle(data.test)
+# 
+# dataset.all.train <- data.train[,-1]
+# dataset.all.test <- data.test[,-1]
+# 
+# dataset.all.train.labels <- factor(data.train[,1])
+# dataset.all.test.labels <- factor(data.test[,1])
+
+dataset.all <- datasetShuffle(dataset.all)
 
 dataset.all.train <- dataset.all[train,-1]
 dataset.all.test <- dataset.all[-train,-1]
@@ -175,14 +190,13 @@ dataset.all.test <- dataset.all[-train,-1]
 dataset.all.train.labels <- factor(dataset.all[train,1])
 dataset.all.test.labels <- factor(dataset.all[-train,1])
 
-model <- knn(dataset.all.train, dataset.all.test, dataset.all.train.labels, 5)
+time.start <- Sys.time()
+model <- knn(dataset.all.train, dataset.all.test, dataset.all.train.labels,5)
+time.end <- Sys.time()
+    
+print(time.taken <- time.end - time.start)
 
-a <- acc(model, dataset.all.test.labels)
-
-sd(a)
-
-
-
+acc(model, dataset.all.test.labels)
 
 
 
