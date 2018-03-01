@@ -1,7 +1,8 @@
 #KNN Assignment
 library("gmodels")
 
-source('C:/Users/Bruger/Desktop/SM-Exercises/loadImage.R', echo=TRUE)
+#source('C:/Users/Bruger/Desktop/SM-Exercises/loadImage.R', echo=TRUE) #This contains Smoothing override method
+source('C:/Users/Bruger/Desktop/Statistical Mashine Learning/BaseFolder/loadImage.R')
 
 directory <- 'C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group';
 

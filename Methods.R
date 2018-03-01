@@ -24,7 +24,7 @@ acc <- function(x, y) {
 }
 
 #Confusion Matrix - The first parameter 'x' is for the predicted model and the second is for the test set.
-confusionMatrix <- function(predicted_model,test_data){
+conMatrix <- function(predicted_model,test_data){
   acc <- 0
   pre <- 0
   sensi <- 0
