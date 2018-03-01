@@ -152,10 +152,13 @@ getAllData <- function(dataList){
   return(idList)
 }
 
-folder<- "C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group"
 
-datalist <- list(list(1), list(1,2,3), list(),list(1,2,3), list(), list(), list(), list(1), list(1), list(1,2,3), 
-                  list(), list(), list(), list(1,2), list(), list(1,2), list(1), list(), list(1,2,3))
+folder<- "C:/Users/Bruger/Desktop/Statistical Mashine Learning/preProcessed/2018/group"
+
+datalist <- list(  list( 1) ,list( 1, 2 ), list( 1, 2, 3 ),   list( 1, 2, 3 ), list( 1, 0, 4, 2, 3 ), 
+                   list( 1, 5, 4, 2, 3 ), list( 0, 2, 3 ), list( 1 ), list( 1, 2, 3 ), list( 1, 2, 3 ), 
+                   list( 1, 2, 3 ), list( 1, 4, 2, 3 ), list( 1, 2, 3 ), list( 1, 2 ), list( 1, 2, 3 ), 
+                   list( 1, 2 ), list( 1, 4, 2, 3 ), list( 1, 4, 2, 3 ), list( 1, 2, 3 ))
 
 idList <- getAllData(datalist)
 

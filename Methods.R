@@ -24,6 +24,7 @@ acc <- function(x, y) {
 }
 
 #Confusion Matrix - The first parameter 'x' is for the predicted model and the second is for the test set.
+con_result <- data.frame()
 conMatrix <- function(predicted_model,test_data){
   acc <- 0
   pre <- 0
@@ -47,10 +48,10 @@ conMatrix <- function(predicted_model,test_data){
   speci <- (TN)/(TN+FP) #Type I error
   print(speci)
   
-  #Names <- c("Accuracy", "Precision", "Sensitivity", "Specificity")
-  #Values <- c(acc, pre, sensi, speci)
+  Names <- c("Accuracy", "Precision", "Sensitivity", "Specificity")
+  Values <- c(acc, pre, sensi, speci)
   
-  #return(con_result <- data.frame(Names, Values))
+  return(con_result <- data.frame(Names, Values))
 }
 
 
