@@ -36,35 +36,36 @@ for(i in 1:length(idList)){
 
 dataset.all <- as.data.frame(id)
 
-#Shuffle data
 
 
-train <- 1:(nrow(dataset.all)/2)
-train <- 1:116000 # 29 persons
 ###### Exercise 2.1 #####
 #Split data 50/50
 
-# #Disjunct - 57 members in total
-# dataset.train <- dataset.all[train,]
-# dataset.test <- dataset.all[-train,]
-# 
-# dataset.train <- datasetShuffle(dataset.train)
-# dataset.test <- datasetShuffle(dataset.test)
-# 
-# dataset.train <- dataset.train[,-1]
-# dataset.test <- dataset.test[,-1]
-# 
-# dataset.train.labels <- factor(dataset.train[,1])
-# dataset.test.labels <- factor(dataset.test[,1])
+#Disjunct - 57 members in total
+train <- 1:116000 # 29 persons
+dataset.train <- dataset.all[train,]
+dataset.test <- dataset.all[-train,]
 
-#All persons
-dataset.all <- datasetShuffle(dataset.all)
+dataset.train <- datasetShuffle(dataset.train)
+dataset.test <- datasetShuffle(dataset.test)
 
-dataset.train <- dataset.all[train,-1]
-dataset.test <- dataset.all[-train,-1]
+dataset.train <- dataset.train[,-1]
+dataset.test <- dataset.test[,-1]
 
-dataset.train.labels <- factor(dataset.all[train,1])
-dataset.test.labels <- factor(dataset.all[-train,1])
+dataset.train.labels <- factor(dataset.train[,1])
+dataset.test.labels <- factor(dataset.test[,1])
+
+# #All persons
+# dataset.all <- datasetShuffle(dataset.all)
+# 
+# #Split data
+# train <- 1:(nrow(dataset.all)/2)
+# 
+# dataset.train <- dataset.all[train,-1]
+# dataset.test <- dataset.all[-train,-1]
+# 
+# dataset.train.labels <- factor(dataset.all[train,1])
+# dataset.test.labels <- factor(dataset.all[-train,1])
 
 PCA.obj <- prcomp(dataset.train)
 
@@ -72,8 +73,8 @@ PCA.obj <- prcomp(dataset.train)
 #plot results of PCA object
 require(graphics)
 
-PropVariancePCA <- (PCA.obj$sdev^2)/sum(PCA.obj$sdev^2)
-CumuPCA <- cumsum(PCA.obj$sdev^2)/sum(PCA.obj$sdev^2)
+PropVariancePCA <- (PCA.obj$sdev^2)/sum(PCA.obj$sdev^2) #Part of variacne as a whole. 
+CumuPCA <- cumsum(PCA.obj$sdev^2)/sum(PCA.obj$sdev^2) #Total Variance
 
 #Sdev
 plot(main = "Standard Deviation of Principle Components", PCA.obj$sdev[1:20], xlab = "Principle Components", ylab = "Standard Deviations", col = "blue", pch = 4, cex = 2, lwd=3)
@@ -87,115 +88,92 @@ plot(main = "Cumulative Proportion of Variance", CumuPCA[1:20], xlab = "Principl
 lines(CumuPCA[1:20], col= "red", lwd = 3)
 
 ##### Exercise 2.1.3 and Exercise 2.1.4 #####
+#Prepare for knn process - Best k values are 3, 5 and 7 from previous assignment (KNN)
+#Code example https://www.kaggle.com/victorzhang/pca-knn-with-r
+
 #PC's representing 80 % of the accumulated variance 
-#REMEMBER to vary k - Three values are enough
 PC.80 <- PCA.obj$x[, CumuPCA < 0.8] # Results in 14 PCs
-
-time.start <- Sys.time()
-model <- knn(dataset.train[,1:14], dataset.test[,1:14], dataset.train.labels[1:14], 3)
-time.end <- Sys.time()
-
-#Run time
-print(time.end-time.start)
-
-#Performance
-accuracy <- acc(model, dataset.test.labels)
 
 #PC's representing 90 % of the accumulated variance
 PC.90 <- PCA.obj$x[, CumuPCA < 0.9] #Results in 23 PCs
 
-time.start <- Sys.time()
-model <- knn(dataset.train[,1:23], dataset.test[,1:23], dataset.train.labels[1:23], 3)
-time.end <- Sys.time()
-
-#Run time
-print(time.end-time.start)
-
-#Performance
-accuracy <- acc(model, dataset.test.labels)
-
 #PC's representing 95 % of the accumulated variance
 PC.95 <- PCA.obj$x[, CumuPCA < 0.95] # Results in 34 PCs
-
-time.start <- Sys.time()
-model <- knn(dataset.train[,1:34], dataset.test[,1:34], dataset.train.labels[1:34], 3)
-time.end <- Sys.time()
-
-#Run time
-print(time.end-time.start)
-
-#Performance
-accuracy <- acc(model, dataset.test.labels)
 
 #PC's representing 99 % of the accumulated variance
 PC.99 <- PCA.obj$x[, CumuPCA < 0.99] # Results in 72 PCs
 
+#The 'train.col.used' must be opdated depending on the number of PCs for specific percentage of variance
+numberOfPCs <- 1:14
+
+#Get train and test data from PCA object
+train.pca <- PCA.obj$x
+test.pca <- predict(PCA.obj, dataset.test)
+
 time.start <- Sys.time()
-model <- knn(dataset.train[,1:72], dataset.test[,1:72], dataset.train.labels[1:72], 3)
+model <- knn(train.pca[,numberOfPCs], test.pca[,numberOfPCs], dataset.train.labels,3)
 time.end <- Sys.time()
 
 #Run time
 print(time.end-time.start)
 
 #Performance
-accuracy <- acc(model, dataset.test.labels)
+acc(model, dataset.test.labels)
 
 ##### Exercise 2.2.1 #####
-normalize() #The best Dataset from Exercise 2.1.3 and Exercise 2.1.4
+#Normalization After PCA was made
+PCA.dataset <- normalize(PCA.obj$x) #The best Dataset from Exercise 2.1.3 (95 % of accumulated variance with k-value of 5)
+numberOfPCs <- 1:34 #The number of PCs.
 
-folds <- createFolds(dataset$V1, 10) #Change the dataset
+folds <- createFolds(PCA.dataset, 10)
 
 a <- list()
 
 for(i in 1:length(folds)){
-  cross.test <- dataset[-folds[[i]],-1]
-  cross.train
+  #cross.test <- PCA.dataset[folds[[i]],-1]
+  #cross.train <- PCA.dataset[-folds[[i]],-1]
   
-  cross.test.labels 
-  cross.train.labels
+  cross.train <- PCA.dataset[-folds,]
+  cross.test <- predict(normalize(PCA.obj),PCA.dataset[folds,])
   
+  #Run KNN algorithm
   time.start <- Sys.time()
-  model <- knn(cross.train, cross.test, cross.train.labels,k) #Change k values
+  model <- knn(cross.train[,numberOfPCs], cross.test[,numberOfPCs], normalize(dataset.train.labels),5)
   time.end <- Sys.time()
   
   a[i] <- acc(model, cross.test.labels) #accuracy
   
 }
+
+plot(a)
+
+#Normalization Before PCA was made
+#RUn the datasets from the begining, normalize the data and run the PCA
+PCA.dataset <- PCA.obj$x
+numberOfPCs <- 1:34
+
+folds <- createFolds(PCA.dataset,10)
+
+a <- list()
+
+for(i in 1:length(folds)){
+  cross.train <- PCA.dataset[-folds,-1]
+  cross.test <- PCA.dataset[folds,-1]
+  
+  #cross.train <- PCA.dataset[-folds,]
+  #cross.test <- predict(PCA.obj, PCA.dataset[folds,])
+  
+  #Run KNN algorithm
+  time.start <- Sys.time()
+  model <- knn(cross.train[,numberOfPCs], cross.test[,numberOfPCs], dataset.train.labels,5)
+  time.end <- Sys.time()
+  
+  a[i] <- acc(model, cross.test.labels) #accuracy
+}
+
 
 #Plot accuracy for each fold
 plot(a)
-
-#Apply Normalization before PCA
-normalize(dataset.all)
-
-dataset.all <- datasetShuffle(dataset.all)
-
-dataset.train <- dataset.all[train,-1]
-dataset.test <- dataset.all[-train,-1]
-
-dataset.train.labels <- factor(dataset.all[train,1])
-dataset.test.labels <- factor(dataset.all[-train,1])
-
-PCA.obj <- prcomp(dataset.train)
-
-folds <- createFolds(dataset$V1, 10) #Change the dataset
-
-a <- list()
-
-for(i in 1:length(folds)){
-  cross.test <- dataset[-folds[[i]],-1]
-  cross.train
-  
-  cross.test.labels 
-  cross.train.labels
-  
-  time.start <- Sys.time()
-  model <- knn(cross.train, cross.test, cross.train.labels,k) #Change k values
-  time.end <- Sys.time()
-  
-  a[i] <- acc(model, cross.test.labels) #accuracy
-  
-}
 
 ##### Exercise 2.3.1 #####
 id <- loadSinglePersonsData(DPI,group,member,folder)
