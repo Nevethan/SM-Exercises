@@ -49,11 +49,12 @@ dataset.test <- dataset.all[-train,]
 dataset.train <- datasetShuffle(dataset.train)
 dataset.test <- datasetShuffle(dataset.test)
 
+dataset.train.labels <- factor(dataset.train[,1])
+dataset.test.labels <- factor(dataset.test[,1])
+
 dataset.train <- dataset.train[,-1]
 dataset.test <- dataset.test[,-1]
 
-dataset.train.labels <- factor(dataset.train[,1])
-dataset.test.labels <- factor(dataset.test[,1])
 
 # #All persons
 # dataset.all <- datasetShuffle(dataset.all)
@@ -104,14 +105,14 @@ PC.95 <- PCA.obj$x[, CumuPCA < 0.95] # Results in 34 PCs
 PC.99 <- PCA.obj$x[, CumuPCA < 0.99] # Results in 72 PCs
 
 #The 'train.col.used' must be opdated depending on the number of PCs for specific percentage of variance
-numberOfPCs <- 1:14
+numberOfPCs <- 1:34
 
 #Get train and test data from PCA object
-train.pca <- PCA.obj$x
-test.pca <- predict(PCA.obj, dataset.test)
+train.pca <- PCA.obj$x #x = scores vector
+test.pca <- predict(PCA.obj, dataset.test) #Finding Principle Components in test
 
 time.start <- Sys.time()
-model <- knn(train.pca[,numberOfPCs], test.pca[,numberOfPCs], dataset.train.labels,3)
+model <- knn(train.pca[,numberOfPCs], test.pca[,numberOfPCs], dataset.train.labels,5)
 time.end <- Sys.time()
 
 #Run time
@@ -121,59 +122,38 @@ print(time.end-time.start)
 acc(model, dataset.test.labels)
 
 ##### Exercise 2.2.1 #####
-#Normalization After PCA was made
-PCA.dataset <- normalize(PCA.obj$x) #The best Dataset from Exercise 2.1.3 (95 % of accumulated variance with k-value of 5)
+#Normalization After PCA 
+#If Normalization has to happen before PCA is run, normalize the dataset before that.
 numberOfPCs <- 1:34 #The number of PCs.
+PCA.dataset <- normalize(PCA.obj$x) #The best Dataset from Exercise 2.1.3 (95 % of accumulated variance with k-value of 5)
 
 folds <- createFolds(PCA.dataset, 10)
 
 a <- list()
+s <- list()
 
 for(i in 1:length(folds)){
-  #cross.test <- PCA.dataset[folds[[i]],-1]
-  #cross.train <- PCA.dataset[-folds[[i]],-1]
+  cross.train <- PCA.dataset[-folds[[i]],]
+  cross.train <- cross.train[,numberOfPCs]
+  #cross.test <- PCA.dataset[folds[[i]],]
   
-  cross.train <- PCA.dataset[-folds,]
-  cross.test <- predict(normalize(PCA.obj),PCA.dataset[folds,])
+  cross.train.labels <- dataset.train.labels[cross.train] ####################  SPØRGER FREDERIK
+
+  test <- dataset.test
+  cross.test <- predict(PCA.obj,test)
   
   #Run KNN algorithm
   time.start <- Sys.time()
-  model <- knn(cross.train[,numberOfPCs], cross.test[,numberOfPCs], normalize(dataset.train.labels),5)
+  model <- knn(cross.train, cross.test[,numberOfPCs], cross.train.labels, k=5)
   time.end <- Sys.time()
   
-  a[i] <- acc(model, cross.test.labels) #accuracy
+  s[i] <- time.end - time.start
+  a[i] <- acc(model, normalize(dataset.test.labels)) #accuracy
   
 }
 
-plot(a)
-
-#Normalization Before PCA was made
-#RUn the datasets from the begining, normalize the data and run the PCA
-PCA.dataset <- PCA.obj$x
-numberOfPCs <- 1:34
-
-folds <- createFolds(PCA.dataset,10)
-
-a <- list()
-
-for(i in 1:length(folds)){
-  cross.train <- PCA.dataset[-folds,-1]
-  cross.test <- PCA.dataset[folds,-1]
-  
-  #cross.train <- PCA.dataset[-folds,]
-  #cross.test <- predict(PCA.obj, PCA.dataset[folds,])
-  
-  #Run KNN algorithm
-  time.start <- Sys.time()
-  model <- knn(cross.train[,numberOfPCs], cross.test[,numberOfPCs], dataset.train.labels,5)
-  time.end <- Sys.time()
-  
-  a[i] <- acc(model, cross.test.labels) #accuracy
-}
-
-
-#Plot accuracy for each fold
-plot(a)
+mean(a)
+mean(s)
 
 ##### Exercise 2.3.1 #####
 id <- loadSinglePersonsData(DPI,group,member,folder)
@@ -187,6 +167,77 @@ image( imageM )
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+train <- 1:116000 # 29 persons
+dataset.train <- dataset.all[train,]
+dataset.test <- dataset.all[-train,]
+
+pca.test <- prcomp(dataset.train)
+
+train.pca <- normalize(pca.test$x)
+test.pca <- predict(pca.test,normalize(dataset.test))
+
+time.start <- Sys.time()
+model <- knn(train.pca[,1:14], test.pca[,1:14], normalize(dataset.train[,1]), 3)
+time.end <- Sys.time()
+
+print(time.end-time.start)
+
+acc(model,dataset.test[,1])
+
+folds <- createFolds(pca.test$x, 10)
+
+for(i in 1:length(folds)){
+  cross.train <- train.pca[-folds[[i]],]
+  test <- dataset.pca[folds[[i]],1:14]
+  
+  cross.pca <- prcomp(cross.train)
+  cross.test <- predict(cross.pca, test)
+  #cross.test <- predict(pca.test, dataset.test)
+  
+  cross.train.labels <- factor(dataset.pca[folds[[i]],1])
+  cross.test.labels <- factor(cross.test)
+  
+}
 
 
 
