@@ -55,6 +55,9 @@ dataset.test.labels <- factor(dataset.test[,1])
 dataset.train <- dataset.train[,-1]
 dataset.test <- dataset.test[,-1]
 
+# dataset.train <- normalize(dataset.train)
+# dataset.test <- normalize(dataset.test)
+
 
 # #All persons
 # dataset.all <- datasetShuffle(dataset.all)
@@ -69,6 +72,7 @@ dataset.test <- dataset.test[,-1]
 # dataset.test.labels <- factor(dataset.all[-train,1])
 
 PCA.obj <- prcomp(dataset.train)
+#PCA.obj.norm <- prcomp(dataset.train)
 
 ##### Exercise 2.1.2 #####
 #plot results of PCA object
@@ -133,111 +137,121 @@ a <- list()
 s <- list()
 
 for(i in 1:length(folds)){
+  #Use PCA.obj.norm if you want the 'normalize data before PCA first' version
   cross.train <- PCA.dataset[-folds[[i]],]
-  cross.train <- cross.train[,numberOfPCs]
+  cross.train <- cross.train[1:2000,numberOfPCs]
   #cross.test <- PCA.dataset[folds[[i]],]
   
-  cross.train.labels <- dataset.train.labels[cross.train] ####################  SPØRGER FREDERIK
+  cross.train.labels <- dataset.train.labels[-folds[[i]]] #Get the labels for dataset. 
+  cross.train.labels <- cross.train.labels[1:2000]
 
+  #NOTE
+  #The lengths of cross.train and cross.train.labels are different. The length of cross.train are all data for 34 PCs.
+  
   test <- dataset.test
-  cross.test <- predict(PCA.obj,test)
+  #test <- dataset.test[folds[[i]],]
+  #test <- norm.test[folds[[i]],] 
+  cross.test <- predict(PCA.obj.norm,test)
   
   #Run KNN algorithm
   time.start <- Sys.time()
-  model <- knn(cross.train, cross.test[,numberOfPCs], cross.train.labels, k=5)
+  model <- knn(cross.train, cross.test[,numberOfPCs], cross.train.labels , 5)
   time.end <- Sys.time()
   
-  s[i] <- time.end - time.start
-  a[i] <- acc(model, normalize(dataset.test.labels)) #accuracy
+  s[i] <- time.end - time.start #runtime 
+  a[i] <- acc(model, dataset.test.labels) #accuracy
   
 }
 
 mean(a)
 mean(s)
 
+plot(a)
+plot(s)
+
 ##### Exercise 2.3.1 #####
+DPI <- 100
+group <- 4
+member <- 3
+
+folder <- 'C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group'
+
+cipherNumber <- 1001
+
+rotateSelf <- function(x) t(apply(x, 2, rev))
+
+
 id <- loadSinglePersonsData(DPI,group,member,folder)
-imageSize <- sqrt(ncol(id) - 1)
-imageM <- matrix( id[cipherNumber,2:ncol(id)],nrow =
-                    imageSize,ncol = imageSize,byrow = FALSE)
 
-imageM <- rotate(imageM) # rotate is a function to rotate the image
+imageSize <- sqrt(ncol(x) - 1)
 
-image( imageM )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-train <- 1:116000 # 29 persons
-dataset.train <- dataset.all[train,]
-dataset.test <- dataset.all[-train,]
-
-pca.test <- prcomp(dataset.train)
-
-train.pca <- normalize(pca.test$x)
-test.pca <- predict(pca.test,normalize(dataset.test))
-
-time.start <- Sys.time()
-model <- knn(train.pca[,1:14], test.pca[,1:14], normalize(dataset.train[,1]), 3)
-time.end <- Sys.time()
-
-print(time.end-time.start)
-
-acc(model,dataset.test[,1])
-
-folds <- createFolds(pca.test$x, 10)
-
-for(i in 1:length(folds)){
-  cross.train <- train.pca[-folds[[i]],]
-  test <- dataset.pca[folds[[i]],1:14]
+imageCreate <- function(x){
+  imageM <- matrix( x[cipherNumber,2:ncol(x)],nrow =
+                      imageSize,ncol = imageSize,byrow = FALSE)
   
-  cross.pca <- prcomp(cross.train)
-  cross.test <- predict(cross.pca, test)
-  #cross.test <- predict(pca.test, dataset.test)
+  imageM <- rotateSelf(imageM) # rotate is a function to rotate the image
   
-  cross.train.labels <- factor(dataset.pca[folds[[i]],1])
-  cross.test.labels <- factor(cross.test)
+  image( imageM )
   
 }
+
+imageCreate(id)
+
+##### Exercise 2.3.2 #####
+eigenVector <- 1:10
+
+for (e in eigenVector) {
+  imageNewM <- matrix(PCA.obj$rotation[,e],nrow = imageSize,ncol = imageSize,byrow = FALSE)
+  image(imageNewM)
+}
+
+##### Exercise 2.3.3 #####
+
+#All PCs
+trunc <- PCA.obj$x[cipherNumber,1:nrow(PCA.obj$rotation)] %*%
+  t(PCA.obj$rotation[,1:nrow(PCA.obj$rotation)])
+
+trunc <- scale(trunc, center = -1 * PCA.obj$center, scale=FALSE)
+
+imageCreate(trunc)
+?prcomp
+##### Exercise 2.3.4 #####
+
+#80 Variacne 
+trunc <- PCA.obj$x[cipherNumber,1:14] %*%
+  t(PCA.obj$rotation[,1:14])
+
+trunc <- scale(trunc, center = -1 * PCA.obj$center, scale=FALSE)
+
+imageCreate(trunc)
+
+#90 Variance
+trunc <- PCA.obj$x[cipherNumber,1:23] %*%
+  t(PCA.obj$rotation[,1:23])
+
+trunc <- scale(trunc, center = -1 * PCA.obj$center, scale=FALSE)
+
+imageCreate(trunc)
+
+#95 Variance
+trunc <- PCA.obj$x[cipherNumber,1:34] %*%
+  t(PCA.obj$rotation[,1:34])
+
+trunc <- scale(trunc, center = -1 * PCA.obj$center, scale=FALSE)
+
+imageCreate(trunc)
+
+##### Exercise 2.3.5 #####
+cipherNumber <- 3501
+p <- PCA.obj$x[cipherNumber, 1:10]
+
+cipherNumber <- 400
+p <- PCA.obj$x[cipherNumber, 1:10]
+
+
+
+
+
 
 
 
