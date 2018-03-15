@@ -37,7 +37,6 @@ for(i in 1:length(idList)){
 dataset.all <- as.data.frame(id)
 
 
-
 ###### Exercise 2.1 #####
 #Split data 50/50
 
