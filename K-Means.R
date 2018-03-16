@@ -10,7 +10,7 @@ id2 <- data.frame(id2)
 
 id <- rbind(id, id2)
 
-id$X1 <- factor(id$X1)
+#id$X1 <- factor(id$X1)
 
 dataset <- data.frame(id)
 
@@ -76,16 +76,34 @@ sum(diag(result$table))/sum(result$table)
 #Cross validation on knn
 
 folds <- createFolds(dataset.train$V1,10)
-#folds <- createFolds(train_data$V1)
+#folds <- createFolds(train_data$V1,10)
 
+#Execution time
 s <- list()
 
 for(i in length(folds)){
-  cross.train <- dataset.train[-folds[[i]],]
-  cross.test <- dataset.test[folds[[i]],]
+  #Clustered dataset - Use the following trainset, but use the same test set.
+  #cross.train <- train_data[-folds[[i]],]
+  #cross.train.labels <- train_labels[-folds[[i]],]
   
-
+  #Raw dataset
+  cross.train <- dataset.train[-folds[[i]],]
+  cross.train.labels <- dataset.train.labels[-folds[[i]],]
+  
+  cross.test <- dataset.test[folds[[i]],]
+  cross.test.labels <- dataset.test.labels[folds[[i]],]
+  
+  time.start <- Sys.time()
+  model <- knn(cross.train, cross.test, cross.train.labels, 3)
+  time.end <- Sys.time()
+  
+  s[i] <- time.end-time.start
 }
+
+##### Exercise 3.1.3 #####
+#Load personImages for 30 personer - 15/15
+
+#Repeat the same process from exercise 3.1.1
 
 
 
