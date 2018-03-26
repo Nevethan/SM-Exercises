@@ -5,7 +5,7 @@ source('C:/Users/Bruger/Desktop/SM-Exercises/k-clustering.R')
 id <- loadSinglePersonsData(100,4,0,folder)
 id <- data.frame(id)
 
-id2 <- loadSinglePersonsData(100,4,1,folder)
+id2 <- loadSinglePersonsData(100,4,2,folder)
 id2 <- data.frame(id2)
 
 id <- rbind(id, id2)
@@ -18,11 +18,11 @@ dataset <- data.frame(id)
 dataset.train <- datasetShuffle(dataset[1:4000,])
 dataset.test <- datasetShuffle(dataset[4001:8000,])
 
-dataset.train.labels <- factor(dataset.train[1:4000,1])
-dataset.test.labels <- factor(dataset.test[4001:8000,1])
+dataset.train.labels <- factor(dataset.train[,1])
+dataset.test.labels <- factor(dataset.test[,1])
 
-dataset.train <- normalize(dataset.train[1:4000,-1])
-dataset.test <- normalize(dataset.test[4001:8000,-1])
+dataset.train <- normalize(dataset.train[,-1])
+dataset.test <- normalize(dataset.test[,-1])
 
 set.seed(1234)
 #set.seed(2345)
@@ -50,13 +50,13 @@ for( i in 2:10) {
 # K values 3,5 og 7
 # Cluster 100, 50 og 25
 time.start <- Sys.time()
-model <- knn(train_data, dataset.test,train_labels,3)
+model <- knn(train_data, dataset.test, train_labels,3)
 time.end <- Sys.time()
 
 print(time.end-time.start)
 
 result <- confusionMatrix(dataset.test.labels, model)
-sum(diag(result$table))/sum(result$table)
+sum(diag(result$table))/sum(result$table) # Precision
 
 
 ##### Exercise 3.1.2 #####
