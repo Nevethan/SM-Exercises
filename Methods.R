@@ -10,6 +10,21 @@ datasetShuffle <- function(dataset){
   return(dataset[sample(nrow(dataset)),])
 }
 
+#Confusion Matrix for multiclass. Calculate the Precision, Recall and Accuracy
+confusionMulti <- function(pred,test){
+  
+  result <- confusionMatrix(test, pred)
+  
+  print("Precision")
+  print(precision) <- (diag(result$table) / rowSums(result$table)) #Precision
+  
+  print("Recall")
+  print(recall) <- (diag(result$table) / colSums(result$table)) #Recall
+  
+  print("Accuracy")
+  print(accuracy) <- sum(diag(result$table))/sum(result$table) #Accuracy
+}
+
 #Method for Accuracy
 acc <- function(x, y) {
   accu = 0

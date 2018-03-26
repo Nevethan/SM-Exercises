@@ -214,6 +214,21 @@ plot(as.dendrogram(data.hclust))
 plot(as.dendrogram(agnes(train_data)))
 plot(as.dendrogram(diana(train_data)))
 
+
 ##### Exercise 3.3.1 #####
 
+precision <- list()
+recall <- list()
 
+for(i in 1:13){
+  model <- knn(dataset.train, dataset.test, dataset.train.labels, k = i, l = i)
+  
+  #ConfusionMatrix 
+  result <- confusionMatrix(dataset.test.labels, model)
+  
+  precision[i] <- (diag(result$table) / rowSums(result$table)) #Precision
+  recall[i] <- (diag(result$table) / colSums(result$table)) #Recall
+  #sum(diag(result$table))/sum(result$table) #Accuracy
+}
+
+plot(recall, precision)
