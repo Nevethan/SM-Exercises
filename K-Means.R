@@ -48,7 +48,7 @@ for( i in 2:10) {
 # K values 3,5 og 7
 # Cluster 100, 50 og 25
 time.start <- Sys.time()
-model <- knn(train_data, dataset.test, train_labels,7)
+model <- knn(train_data, dataset.test, train_labels,3)
 time.end <- Sys.time()
 
 print(time.end-time.start)
@@ -61,45 +61,70 @@ sum(diag(result$table))/sum(result$table) # Accuracy
 #Use the knn process for cluster centroid training data
 #Used to compare the following (knn with raw data) in the end
 
-# #Performing knn on raw data
-# time.start <- Sys.time()
-# model <- knn(dataset.train, dataset.test, dataset.train.labels, 3)
-# time.end <- Sys.time()
-# 
-# print(time.end-time.start)
-# 
-# result <- confusionMatrix(dataset.test.labels, model)
-# sum(diag(result$table))/sum(result$table)
+#Performing knn on raw data
+time.start <- Sys.time()
+model <- knn(dataset.train, dataset.test, dataset.train.labels, 3)
+time.end <- Sys.time()
 
-#Cross validation on knn
+print(time.end-time.start)
 
-folds <- createFolds(dataset.train,10) #list levels of factor v1
-#folds <- createFolds(train_data$V1,10)
+result <- confusionMatrix(dataset.test.labels, model)
+sum(diag(result$table))/sum(result$table) #Accuracy
 
-#Execution time and Accuracy
-s <- list()
-a <- list()
+#Cross validation on KMeans
+dataset.train <- datasetShuffle(dataset[1:4000,])
+folds <- createFolds(dataset.train,10)
 
-for(i in length(folds)){
-  #Clustered dataset - Use the following trainset, but use the same test set.
-  #cross.train <- train_data[-folds[[i]],]
-  #cross.train.labels <- train_labels[-folds[[i]],]
+a <- c()
+c <- list()
+l <- list()
+
+for(i in 1:length(folds)){
+  #Training dataset for cross validation
+  cross.dataset.train <- dataset.train[-folds[[i]],-1]
+  cross.dataset.train.labels <- factor(dataset.train[-folds[[i]],1])
   
-  #Raw dataset
-  cross.train <- dataset.train[-folds[[i]],]
-  cross.train.labels <- dataset.train.labels[-folds[[i]],]
+  cross.dataset.test <- dataset.train[folds[[i]],-1]
+  cross.dataset.test.labels <- factor(dataset.train[folds[[i]],1])
   
-  cross.test <- dataset.test[folds[[i]],]
-  cross.test.labels <- dataset.test.labels[folds[[i]],]
+  #Cross Validation for Kmeans
+  for( j in 0:9) {
+    clusterData <- kmeans(cross.dataset.train[ cross.dataset.train.labels == j, ],numberOfClusters)
+    cipher_cluster[[j + 1]] <- clusterData$centers #Finding Centroids
+    label_cluster[[j + 1]] <- c(1:numberOfClusters)*0 + j
+  }
   
-  time.start <- Sys.time()
-  model <- knn(cross.train, cross.test, cross.train.labels, 3)
-  time.end <- Sys.time()
+  train_labels <- factor(unlist(label_cluster))
+  train_data <- cipher_cluster[[1]]
   
-  s[i] <- time.end-time.start
-  a[i] <- acc(model,cross.test.labels)
-
+  for( k in 2:10) {
+    train_data <- rbind(train_data,cipher_cluster[[k]])
+  }
+  
+  c[[i]] <- train_data
+  l[[i]] <- train_labels
+  
+  model <- knn(train_data, cross.dataset.test, train_labels,3)
+  
+  result <- confusionMatrix(cross.dataset.test.labels, model)
+  a[i] <- sum(diag(result$table))/sum(result$table) # Accuracy
 }
+
+plot(a, ylab = "Accuracy", xlab = "Folds")
+
+#Found the Train_data with best Centroids. Use it in knn again.
+#Change the index manually. 
+train_data <- c[[2]]
+train_labels <- factor(unlist(l[[2]]))
+
+time.start <- Sys.time()
+model <- knn(train_data, dataset.test, train_labels,3)
+time.end <- Sys.time()
+
+print(time.end - time.start)
+
+result <- confusionMatrix(dataset.test.labels, model)
+sum(diag(result$table))/sum(result$table) # Accuracy
 
 ##### Exercise 3.1.3 #####
 ## Prepre the data ##
@@ -149,16 +174,19 @@ result <- confusionMatrix(dataset.test.labels, model)
 sum(diag(result$table))/sum(result$table) #Accuracy
 
 ##### Exercise 3.2.1 #####
-
+library(cluster)
+library(dendextend)
 #Repeat this process for 10 times. Remember to change 'e' according to specific digit
 inst <- data.frame()
-e <- 3600
+e <- 3900
 for(i in 1:5){
-  inst <- rbind(inst,id2[e,-1])
+  data <- id2[e,-1]
+  data[["id"]] <- paste("Cipher 9 (",  e , ")",sep = "")
+  inst <- rbind(inst,data)
   e <- e +1
 }
 
-data.norm <- scale(inst)
+data.norm <- scale(inst[,-325])
 
 #Dissimilarity function
 fun <- function(x) as.dist((1-cor(t(x)))/2)
@@ -169,6 +197,7 @@ data.dis <- fun(data.norm)
 #Calculate hierarchical clustering (method is type of linkage)
 data.hclust <- hclust(data.dis, method="ward.D2")
 
+data.hclust$labels = inst$id #Replace labels with labels from inst.
 #Plot different dendrograms
 plot(data.hclust)
 plot(as.dendrogram(data.hclust))
@@ -180,8 +209,8 @@ cipher_cluster <- c()
 label_cluster <- c()
 numberOfClusters <-  5
 
-data.train <- id2[,-1]
-data.train.labels <- factor(id2[,1])
+dataset.train <- id2[,-1]
+dataset.train.labels <- factor(id2[,1])
 
 #Performing K-means clusering of each cipher individually for the training set. 
 # -> represent the training data as a number of cluster centroids
@@ -189,15 +218,25 @@ for( i in 0:9) {
   clusterData <- kmeans(dataset.train[ dataset.train.labels == i, ],numberOfClusters)
   cipher_cluster[[i + 1]] <- clusterData$centers #Finding Centroids
   label_cluster[[i + 1]] <- c(1:numberOfClusters)*0 + i
+  
 }
 
 train_labels <- factor(unlist(label_cluster))
+train_data <- data.frame()
 train_data <- cipher_cluster[[1]]
+
 for( i in 2:10) {
   train_data <- rbind(train_data,cipher_cluster[[i]])
 }
 
-data.norm <- scale(train_data)
+train_data <- as.data.frame(train_data)
+train_data[["id"]] <- ""
+for(i in 0:9){
+  for(k in 1:5){
+      train_data[[(i*5)+k,"id"]] <- paste("Cipher " , i , " (",  k , ")",sep = "")
+  }
+}
+data.norm <- scale(train_data[,-325])
 
 #Dissimilarity function
 fun <- function(x) as.dist((1-cor(t(x)))/2)
@@ -208,9 +247,10 @@ data.dis <- fun(data.norm)
 #Calculate hierarchical clustering (method is type of linkage)
 data.hclust <- hclust(data.dis, method="ward.D2")
 
+data.hclust$labels = train_data[,325] #Replace labels with labels from inst.
 #Plot different dendrograms
 plot(data.hclust)
-plot(as.dendrogram(data.hclust))
+plot(as.dendrogram(data.hclust), )
 plot(as.dendrogram(agnes(train_data)))
 plot(as.dendrogram(diana(train_data)))
 
