@@ -201,8 +201,6 @@ data.hclust$labels = inst$id #Replace labels with labels from inst.
 #Plot different dendrograms
 plot(data.hclust)
 plot(as.dendrogram(data.hclust))
-plot(as.dendrogram(agnes(inst)))
-plot(as.dendrogram(diana(inst)))
 
 ##### Exercise 3.2.2 #####
 cipher_cluster <- c()
@@ -233,7 +231,8 @@ train_data <- as.data.frame(train_data)
 train_data[["id"]] <- ""
 for(i in 0:9){
   for(k in 1:5){
-      train_data[[(i*5)+k,"id"]] <- paste("Cipher " , i , " (",  k , ")",sep = "")
+    #Specifying the cipher for each cluster.
+    train_data[[(i*5)+k,"id"]] <- paste("Cipher " , i , " (",  k , ")",sep = "")
   }
 }
 data.norm <- scale(train_data[,-325])
@@ -250,25 +249,58 @@ data.hclust <- hclust(data.dis, method="ward.D2")
 data.hclust$labels = train_data[,325] #Replace labels with labels from inst.
 #Plot different dendrograms
 plot(data.hclust)
-plot(as.dendrogram(data.hclust), )
-plot(as.dendrogram(agnes(train_data)))
-plot(as.dendrogram(diana(train_data)))
-
+plot(as.dendrogram(data.hclust))
 
 ##### Exercise 3.3.1 #####
-
 precision <- list()
 recall <- list()
 
+#precision-recall curves for 1 to 13 "k" with "l" values up to the "k" value
 for(i in 1:13){
-  model <- knn(dataset.train, dataset.test, dataset.train.labels, k = i, l = i)
+  precision.sub <- list()
+  recall.sub <- list()
+  for(j in 1:i){
+      model <- knn(train_data, dataset.test, train_labels, k = i, l = j)
+      
+      #ConfusionMatrix 
+      result <- confusionMatrix(dataset.test.labels, model)
+      
+      precision.sub[j] <- (diag(result$table) / rowSums(result$table)) #Precision
+      recall.sub[j] <- (diag(result$table) / colSums(result$table)) #Recall
+  }
   
-  #ConfusionMatrix 
-  result <- confusionMatrix(dataset.test.labels, model)
+  precision[[i]] <- precision.sub
+  recall[[i]] <- recall.sub
   
-  precision[i] <- (diag(result$table) / rowSums(result$table)) #Precision
-  recall[i] <- (diag(result$table) / colSums(result$table)) #Recall
-  #sum(diag(result$table))/sum(result$table) #Accuracy
 }
 
-plot(recall, precision)
+e <- 1
+colors <- c("red", "green", "blue", "yellow", "brown", "black", "orange", "purple", "pink",
+            "cyan", "darkgreen", "seagreen", "plum")
+
+plot(recall[[e]], precision[[e]], col = colors[1], ylim = c(0.93,1), xlim = c(0.96,1))
+lines(recall[[e]], precision[[e]], col = colors[1], lwd = 0.5)
+for(i in 2:13){
+  points(recall[[i]], precision[[i]], col= colors[i])
+  lines(recall[[i]], precision[[i]], col= colors[i], lwd = 0.5)
+}
+
+##### Exercise 3.3.2 #####
+k <- 1:13
+F1 <- c()
+
+for(i in k){
+  F1.sub <- c()
+  for(j in 1:i){
+    #Nested lists, hence double indexes. The list has k elements, which each contains l elements.
+    F1.sub[j] <- (2 *(precision[[i]][[j]]) * (recall[[i]][[j]])) / sum(precision[[i]][[j]],recall[[i]][[j]])
+  }
+  F1[i] <- max(F1.sub)
+}
+
+plot(k,F1)
+lines(k,F1, col=colors[1])
+
+
+
+

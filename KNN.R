@@ -57,7 +57,7 @@ folds <- createFolds(dataset$V1, 10)
 accuracy_cross <- list()
 accuracy_cross.overall <- list()
 
-a <- list()
+a <- list
 s <- list()
 
 for(i in k){
