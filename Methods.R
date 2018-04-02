@@ -8,6 +8,14 @@ normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
 
+#Run time 
+time.start <- Sys.time()
+time.end <- Sys.time()
+
+time.difference <- function(end,start){
+  print(end-start)
+}
+
 #Dataset shuffle
 datasetShuffle <- function(dataset){
   return(dataset[sample(nrow(dataset)),])
@@ -65,11 +73,6 @@ conMatrix <- function(predicted_model,test_data){
   print(sensi)
   speci <- (TN)/(TN+FP) #Type I error
   print(speci)
-  
-  Names <- c("Accuracy", "Precision", "Sensitivity", "Specificity")
-  Values <- c(acc, pre, sensi, speci)
-  
-  return(con_result <- data.frame(Names, Values))
 }
 
 

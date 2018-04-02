@@ -128,7 +128,7 @@ sum(diag(result$table))/sum(result$table) # Accuracy
 
 ##### Exercise 3.1.3 #####
 ## Prepre the data ##
-#Load personImages for 40 personer - 20/20
+#Load personImages for 40 personer - 20/20 (getAllData)
 #Repeat the same process from exercise 3.1.1
 #Disjunct dataset for 40 persons. 
 dataset.train <- datasetShuffle(dataset.all[1:80000,])
@@ -278,7 +278,7 @@ e <- 1
 colors <- c("red", "green", "blue", "yellow", "brown", "black", "orange", "purple", "pink",
             "cyan", "darkgreen", "seagreen", "plum")
 
-plot(recall[[e]], precision[[e]], col = colors[1], ylim = c(0.93,1), xlim = c(0.96,1))
+plot(recall[[e]], precision[[e]], col = colors[1], ylim = c(0.93,1), xlim = c(0.96,1), xlab = "Recall", ylab = "Precision")
 lines(recall[[e]], precision[[e]], col = colors[1], lwd = 0.5)
 for(i in 2:13){
   points(recall[[i]], precision[[i]], col= colors[i])
