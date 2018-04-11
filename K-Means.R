@@ -63,7 +63,7 @@ sum(diag(result$table))/sum(result$table) # Accuracy
 
 #Performing knn on raw data
 time.start <- Sys.time()
-model <- knn(dataset.train, dataset.test, dataset.train.labels, 3)
+model <- knn(dataset.train, dataset.test, dataset.train.labels, 7)
 time.end <- Sys.time()
 
 print(time.end-time.start)
@@ -104,7 +104,7 @@ for(i in 1:length(folds)){
   c[[i]] <- train_data
   l[[i]] <- train_labels
   
-  model <- knn(train_data, cross.dataset.test, train_labels,3)
+  model <- knn(train_data, cross.dataset.test, train_labels,5)
   
   result <- confusionMatrix(cross.dataset.test.labels, model)
   a[i] <- sum(diag(result$table))/sum(result$table) # Accuracy
@@ -118,7 +118,7 @@ train_data <- c[[2]]
 train_labels <- factor(unlist(l[[2]]))
 
 time.start <- Sys.time()
-model <- knn(train_data, dataset.test, train_labels,3)
+model <- knn(train_data, dataset.test, train_labels,5)
 time.end <- Sys.time()
 
 print(time.end - time.start)
@@ -263,7 +263,7 @@ for(i in 1:13){
       model <- knn(train_data, dataset.test, train_labels, k = i, l = j)
       
       #ConfusionMatrix 
-      result <- confusionMatrix(dataset.test.labels, model)
+      result <- confusionMatrix(dataset.test.labels,model)
       
       precision.sub[j] <- (diag(result$table) / rowSums(result$table)) #Precision
       recall.sub[j] <- (diag(result$table) / colSums(result$table)) #Recall
@@ -293,7 +293,7 @@ for(i in k){
   F1.sub <- c()
   for(j in 1:i){
     #Nested lists, hence double indexes. The list has k elements, which each contains l elements.
-    F1.sub[j] <- (2 *(precision[[i]][[j]]) * (recall[[i]][[j]])) / sum(precision[[i]][[j]],recall[[i]][[j]])
+    F1.sub[j] <- 2 *(((precision[[i]][[j]]) * (recall[[i]][[j]])) / sum(precision[[i]][[j]],recall[[i]][[j]]))
   }
   F1[i] <- max(F1.sub)
 }

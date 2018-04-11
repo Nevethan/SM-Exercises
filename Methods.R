@@ -1,5 +1,6 @@
 #This file contains different methods which is need for different algorithms.
 #List of colors
+
 colors <- c("red", "green", "blue", "yellow", "brown", "black", "orange", "purple", "pink",
             "cyan", "darkgreen", "seagreen", "plum")
 
@@ -9,10 +10,10 @@ normalize <- function(x) {
 }
 
 #Run time 
-time.start <- Sys.time()
-time.end <- Sys.time()
+start <- Sys.time()
+end <- Sys.time()
 
-time.difference <- function(end,start){
+timeDifference <- function(end,start){
   print(end-start)
 }
 
