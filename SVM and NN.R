@@ -1,5 +1,6 @@
 library(RSNNS)
 library(devtools)
+library(kernlab)
 
 ##### Preproccessing #####
 source('C:/Users/Bruger/Desktop/Statistical Mashine Learning/BaseFolder/loadImage.R')
@@ -39,7 +40,7 @@ dataset.all <- as.data.frame(id)
 
 #Split data 50/50
 
-#Disjunct - 20 members in total
+#Disjunct - 20 members in total (10/10)
 dataset.train <- dataset.all[1:40000,]
 dataset.test <- dataset.all[40001:80000,]
 
@@ -51,56 +52,43 @@ dataset.test.labels <- factor(dataset.test[,1])
 
 dataset.train <- dataset.train[,-1]
 dataset.test <- dataset.test[,-1]
-
+ 
 ##### Exericse 5.1.1 #####
 #Format the training classes so it matches a neural net with N inputs and 10
 #outputs where each of the outputs matches a given class
 
-lev <- levels(dataset.train$X1)
+lev <- levels(dataset.train.labels) # Number of classes
 
-nnTrainingClass <- matrix(nrow = length(dataset.train$X1), ncol = 10, data = 0)
-
-for(i in 1:length(dataset.train$X1)) {
-  matchList <- match(lev,toString(dataset.train$X1[i]))
+nnTrainingClass <- matrix(nrow = length(dataset.train.labels), ncol = 10, data = 0) # Create a list probabilities, for all labels
+for(i in 1:length(dataset.train.labels)) { # Set probabilities to one for matching class
+  matchList <- match(lev,toString(dataset.train.labels[i]))
   matchList[is.na(matchList)] <- 0
   nnTrainingClass[i,] <- matchList
 }
-
-trainingClass <- as.data.frame(nnTrainingClass) #our targets (labels)
+trainingClass <- as.data.frame(nnTrainingClass)
 
 ##### Exercise 5.1.2 #####
 #Train a neural network with N inputs and 10 outputs
 
-#all 'na' values are replaced with '0'
-dataset.train <- dataset.train[is.na(dataset.train)] <- 0
-
 #Training the neural network with standard backpropagation 
-nn.model <- mlp(dataset.train, trainingClass, learnFunc = "Std_Backpropagation", c(5))
 #Learning Algorithms
-nn.model <- mlp(dataset.train,trainingClass, size = c(3), maxit = 1000, learnFunc = "Std_Backpropagation")
+nn.model <- mlp(dataset.train, trainingClass, size = c(40,40,40), 
+                maxit = 100, learnFunc = "Std_Backpropagation")
 
 ##### Exercise 5.1.3 #####
 #Evaluation of the Neural network
 
 #Code from learning algorithms
 #Predictions 
-predictions <- predict(model.mlp, t(t(x)))
-#Error over iterations (Epochs)
-plotIterativeError(model.mlp)
+predictions <- predict(nn.model, dataset.test)
 
-#Mean Squared Error
-mse <- mean(( x - predictions)^2)
-
-#Root Mean Squared Error 
-rmse <- function(error) # error <- actual - predicted
-{
-  sqrt(mean(error^2))
-}
-
-rmse(x-predictions)
+#Error over iterations 
+plotIterativeError(nn.model)
 
 #Inspiration code from exercise 
 #Remember to run 'predictions'
+responselist <- 0
+
 responselist <- matrix(nrow = length(predictions[,1]), ncol = 1, data = "Na")
 
 for(i in 1:nrow(predictions)) {
@@ -109,7 +97,27 @@ for(i in 1:nrow(predictions)) {
 
 responselist <- data.frame(responselist)
 responselist[,1] <- as.factor(responselist[,1])
+# Calculating the accuracy
+agreement_rbf <- responselist[,1] == dataset.test.labels
+table(agreement_rbf)
+prop.table(table(agreement_rbf))
 
+##### Exericse 5.1.4 #####
+#Try different parameters - number of neurons, number of hidden layers and differet learning parameters
+#Try with 45,50,55 and 60 neurons
+nn.model <- mlp(dataset.train,trainingClass, size = c(45,45,45), 
+                  maxit = 100, learnFunc = "Std_Backpropagation")
+  
+predictions <- predict(nn.model, dataset.test)
+  
+responselist <- matrix(nrow = length(predictions[,1]), ncol = 1, data = "Na")
+  
+for(j in 1:nrow(predictions)) {
+  responselist[i,] <- toString( which(predictions[j,]==max(predictions[j,])) - 1 )
+}
+responselist <- data.frame(responselist)
+responselist[,1] <- as.factor(responselist[,1])
+  
 # Calculating the accuracy
 agreement_rbf <- responselist[,1] == test[,1]
 table(agreement_rbf)
@@ -125,38 +133,38 @@ prop.table(table(agreement_rbf))
 
 
 
+ 
 
 
+##### Exericise 5.2.1 #####
 
+svm.model <- ksvm(dataset.train.labels~., dataset.train, kernel = "rbfdot", kpar = "automatic", C=1)
 
+#predict svm with test data
+predictions <- predict(svm.model, dataset.test)
 
+#Confusion Matrix
+table(predictions, dataset.test.labels)
 
+#Accuracy - I think ???
+mean(predictions == dataset.test.labels)
 
+##### Exericse 5.2.2 #####
+#Try making svms with different parameters
+#Kernels :  linear ("vanilladot" ), polynomial ("polydot"), radial basis ("rbfdot") kernel
+#Type : "C-svc" - C classification
 
+svm.model <- ksvm(dataset.train.labels~., dataset.train, kernel = "rbfdot", kpar = "automatic", C=1)
 
-##### Exericse 5.1.4 #####
-#Try different parameters - number of neurons, number of hidden layers and differet learning parameters
+#predict svm with test data
+predictions <- predict(svm.model, dataset.test)
 
-neurons <- c(5,10,15,20)
+#Confusion Matrix
+table(predictions, dataset.test.labels)
 
-for(i in length(neurons)){
-  nn.model <- mlp(dataset.train,trainingClass, size = c(neurons[i]), maxit = 1000, learnFunc = "Std_Backpropagation")
-  
-  predictions <- predict(nn.model, dataset.test)
-  
-  responselist <- matrix(nrow = length(predictions[,1]), ncol = 1, data = "Na")
-  
-  for(i in 1:nrow(predictions)) {
-    responselist[i,] <- toString( which(predictions[i,]==max(predictions[i,])) - 1 )
-  }
-  responselist <- data.frame(responselist)
-  responselist[,1] <- as.factor(responselist[,1])
-  
-  # Calculating the accuracy
-  agreement_rbf <- responselist[,1] == test[,1]
-  table(agreement_rbf)
-  prop.table(table(agreement_rbf))
-}
+#Accuracy - I think ???
+mean(predictions == dataset.test.labels)
+
 
 
 
