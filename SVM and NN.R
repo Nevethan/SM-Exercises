@@ -1,6 +1,7 @@
 library(RSNNS)
 library(devtools)
 library(kernlab)
+library(beepr)
 
 ##### Preproccessing #####
 source('C:/Users/Bruger/Desktop/Statistical Mashine Learning/BaseFolder/loadImage.R')
@@ -41,8 +42,8 @@ dataset.all <- as.data.frame(id)
 #Split data 50/50
 
 #Disjunct - 20 members in total (10/10)
-dataset.train <- dataset.all[1:40000,]
-dataset.test <- dataset.all[40001:80000,]
+dataset.train <- dataset.all[1:80000,]
+dataset.test <- dataset.all[80001:160000,]
 
 dataset.train <- datasetShuffle(dataset.train)
 dataset.test <- datasetShuffle(dataset.test)
@@ -72,8 +73,14 @@ trainingClass <- as.data.frame(nnTrainingClass)
 
 #Training the neural network with standard backpropagation 
 #Learning Algorithms
+time.start <- Sys.time()
 nn.model <- mlp(dataset.train, trainingClass, size = c(40,40,40), 
-                maxit = 100, learnFunc = "Std_Backpropagation")
+                maxit = 50, learnFunc = "Std_Backpropagation")
+
+time.end <- Sys.time()
+
+print(time.end-time.start)
+
 
 ##### Exercise 5.1.3 #####
 #Evaluation of the Neural network
@@ -104,37 +111,40 @@ prop.table(table(agreement_rbf))
 
 ##### Exericse 5.1.4 #####
 #Try different parameters - number of neurons, number of hidden layers and differet learning parameters
-#Try with 45,50,55 and 60 neurons
-nn.model <- mlp(dataset.train,trainingClass, size = c(45,45,45), 
-                  maxit = 100, learnFunc = "Std_Backpropagation")
+#Try with 45,50,80 and 100 neurons
+neurons <- 50
+nn.model <- mlp(dataset.train,trainingClass, size = c(neurons,neurons,neurons, neurons, neurons, neurons ,neurons ,neurons ,neurons ,neurons), 
+                  maxit = 50, learnFunc = "Std_Backpropagation")
+
+#Change the number of the name according to the number of neurons.
+model.45 <- nn.model$IterativeFitError
+
+#Iterative values for one model
+plotIterativeError(nn.model)
+
+#Iterative values from three different models in one plot. 
+plot(1:50,model.45, xlab = "Iterations", ylab = "Weighted SSE", col = colors[1], ylim = c(20000,40000))
+points(1:50,model.50, col = colors[2])
+points(1:50,model.80, col = colors[3])
+
+legend(40,35000, legend = c("45 neurons", "50 neurons", "80 neurons"), col = colors[1:3], pt.bg = colors[1:3], pch = c(1))
   
 predictions <- predict(nn.model, dataset.test)
-  
+
+responselist <- 0
 responselist <- matrix(nrow = length(predictions[,1]), ncol = 1, data = "Na")
-  
-for(j in 1:nrow(predictions)) {
-  responselist[i,] <- toString( which(predictions[j,]==max(predictions[j,])) - 1 )
+
+for(i in 1:nrow(predictions)) {
+  responselist[i,] <- toString( which(predictions[i,]==max(predictions[i,])) - 1 )
 }
+
 responselist <- data.frame(responselist)
 responselist[,1] <- as.factor(responselist[,1])
-  
+
 # Calculating the accuracy
-agreement_rbf <- responselist[,1] == test[,1]
+agreement_rbf <- responselist[,1] == dataset.test.labels
 table(agreement_rbf)
 prop.table(table(agreement_rbf))
-
-
-
-
-
-
-
-
-
-
-
- 
-
 
 ##### Exericise 5.2.1 #####
 
@@ -146,7 +156,7 @@ predictions <- predict(svm.model, dataset.test)
 #Confusion Matrix
 table(predictions, dataset.test.labels)
 
-#Accuracy - I think ???
+#Accuracy 
 mean(predictions == dataset.test.labels)
 
 ##### Exericse 5.2.2 #####
@@ -162,10 +172,6 @@ predictions <- predict(svm.model, dataset.test)
 #Confusion Matrix
 table(predictions, dataset.test.labels)
 
-#Accuracy - I think ???
+#Accuracy - 
 mean(predictions == dataset.test.labels)
-
-
-
-
 
