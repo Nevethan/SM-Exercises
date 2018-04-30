@@ -112,23 +112,20 @@ prop.table(table(agreement_rbf))
 ##### Exericse 5.1.4 #####
 #Try different parameters - number of neurons, number of hidden layers and differet learning parameters
 #Try with 45,50,80 and 100 neurons
-neurons <- 50
-nn.model <- mlp(dataset.train,trainingClass, size = c(neurons,neurons,neurons, neurons, neurons, neurons ,neurons ,neurons ,neurons ,neurons), 
-                  maxit = 50, learnFunc = "Std_Backpropagation")
+neurons <- 45
+nn.model <- mlp(dataset.train,trainingClass, size = c(neurons,neurons,neurons), 
+                maxit = 50, learnFunc = "Std_Backpropagation")
+
+#neural network with 10 hidden layers
+#nn.model <- mlp(dataset.train,trainingClass, size = c(neurons,neurons,neurons, neurons, neurons, neurons ,neurons ,neurons ,neurons ,neurons), 
+#                  maxit = 50, learnFunc = "Std_Backpropagation")
 
 #Change the number of the name according to the number of neurons.
 model.45 <- nn.model$IterativeFitError
 
 #Iterative values for one model
-plotIterativeError(nn.model)
+#plotIterativeError(nn.model)
 
-#Iterative values from three different models in one plot. 
-plot(1:50,model.45, xlab = "Iterations", ylab = "Weighted SSE", col = colors[1], ylim = c(20000,40000))
-points(1:50,model.50, col = colors[2])
-points(1:50,model.80, col = colors[3])
-
-legend(40,35000, legend = c("45 neurons", "50 neurons", "80 neurons"), col = colors[1:3], pt.bg = colors[1:3], pch = c(1))
-  
 predictions <- predict(nn.model, dataset.test)
 
 responselist <- 0
@@ -146,15 +143,28 @@ agreement_rbf <- responselist[,1] == dataset.test.labels
 table(agreement_rbf)
 prop.table(table(agreement_rbf))
 
+#Iterative values from three different models in one plot. 
+plot(1:50,model.45, xlab = "Iterations", ylab = "Weighted SSE", col = colors[1])
+points(1:50,model.50, col = colors[2])
+points(1:50,model.80, col = colors[3])
+
+legend(40,35000, legend = c("45 neurons", "50 neurons", "80 neurons"), col = colors[1:3], pt.bg = colors[1:3], pch = c(1))
+
+
 ##### Exericise 5.2.1 #####
 
+#Change the 'C' values to 0.5 and 1.
+time.start <- Sys.time()
 svm.model <- ksvm(dataset.train.labels~., dataset.train, kernel = "rbfdot", kpar = "automatic", C=1)
+time.end <- Sys.time()
+
+print(time.end-time.start)
 
 #predict svm with test data
 predictions <- predict(svm.model, dataset.test)
 
 #Confusion Matrix
-table(predictions, dataset.test.labels)
+#table(predictions, dataset.test.labels)
 
 #Accuracy 
 mean(predictions == dataset.test.labels)
@@ -162,16 +172,22 @@ mean(predictions == dataset.test.labels)
 ##### Exericse 5.2.2 #####
 #Try making svms with different parameters
 #Kernels :  linear ("vanilladot" ), polynomial ("polydot"), radial basis ("rbfdot") kernel
-#Type : "C-svc" - C classification
+#Kpar : linear = "automatic", polynomial = "degree", radial basis = "sigma"
+#Since we use type = "C-svc" (default), we only have to change the parameter 'C' - cost of constraints violation
+#Try C values - 0.5 and 1
 
-svm.model <- ksvm(dataset.train.labels~., dataset.train, kernel = "rbfdot", kpar = "automatic", C=1)
+time.start <- Sys.time()
+svm.model <- ksvm(dataset.train.labels~., dataset.train, kernel = "rbfdot", kpar = "sigma", C=1)
+time.end <- Sys.time()
+
+print(time.end-time.start)
 
 #predict svm with test data
 predictions <- predict(svm.model, dataset.test)
 
 #Confusion Matrix
-table(predictions, dataset.test.labels)
+#table(predictions, dataset.test.labels)
 
-#Accuracy - 
+#Accuracy 
 mean(predictions == dataset.test.labels)
 

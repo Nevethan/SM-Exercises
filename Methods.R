@@ -9,14 +9,6 @@ normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
 
-#Run time 
-start <- Sys.time()
-end <- Sys.time()
-
-timeDifference <- function(end,start){
-  print(end-start)
-}
-
 #Dataset shuffle
 datasetShuffle <- function(dataset){
   return(dataset[sample(nrow(dataset)),])
