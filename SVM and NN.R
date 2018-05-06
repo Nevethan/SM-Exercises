@@ -4,9 +4,13 @@ library(kernlab)
 library(beepr)
 
 ##### Preproccessing #####
+
+# Remember to source both loadImageR (From SVN folder) and the Methods.R file which Nevethan put together
 source('C:/Users/Bruger/Desktop/Statistical Mashine Learning/BaseFolder/loadImage.R')
+source('Methods.R')
 
 #Get all data from folder
+# Remember to run id <- data.frame() before running getAllData function
 getAllData <- function(dataList){
   id <- data.frame()
   idList <- list()
@@ -22,6 +26,8 @@ getAllData <- function(dataList){
   return(idList)
 }
 
+# Change to the folder where you have stored the preprocessed images from SVN.
+# Do not include group number, that's handled in datalist
 folder<- "C:/Users/Bruger/Desktop/Statistical Mashine Learning/preProcessed/2018/group"
 
 datalist <- list(  list( 1) ,list( 1, 2 ), list( 1, 2, 3 ),   list( 1, 2, 3 ), list( 1, 0, 4, 2, 3 ), 
@@ -39,21 +45,32 @@ for(i in 1:length(idList)){
 
 dataset.all <- as.data.frame(id)
 
-#Split data 50/50
+# Split data 50/50
 
-#Disjunct - 20 members in total (10/10)
-dataset.train <- dataset.all[1:80000,]
-dataset.test <- dataset.all[80001:160000,]
+#Disjunct - 40 members in total (20/20)
+#dataset.train <- dataset.all[1:80000,]
+#dataset.test <- dataset.all[80001:160000,]
 
-dataset.train <- datasetShuffle(dataset.train)
-dataset.test <- datasetShuffle(dataset.test)
+#dataset.train <- datasetShuffle(dataset.train)
+#dataset.test <- datasetShuffle(dataset.test)
+
+#dataset.train.labels <- factor(dataset.train[,1])
+#dataset.test.labels <- factor(dataset.test[,1])
+
+#dataset.train <- dataset.train[,-1]
+#dataset.test <- dataset.test[,-1]
+ 
+# All persons in for 10 person training 10 person test
+dataset.shuffle <- datasetShuffle(dataset.all)
+dataset.train <- dataset.shuffle[1:40000,]
+dataset.test <- dataset.shuffle[40001:80000,]
 
 dataset.train.labels <- factor(dataset.train[,1])
 dataset.test.labels <- factor(dataset.test[,1])
 
 dataset.train <- dataset.train[,-1]
 dataset.test <- dataset.test[,-1]
- 
+
 ##### Exericse 5.1.1 #####
 #Format the training classes so it matches a neural net with N inputs and 10
 #outputs where each of the outputs matches a given class
@@ -73,14 +90,12 @@ trainingClass <- as.data.frame(nnTrainingClass)
 
 #Training the neural network with standard backpropagation 
 #Learning Algorithms
-time.start <- Sys.time()
-nn.model <- mlp(dataset.train, trainingClass, size = c(40,40,40), 
-                maxit = 50, learnFunc = "Std_Backpropagation")
-
+time.start <- Sys.time() 
+nn.model <- mlp(dataset.train, trainingClass, size = c(40,40,40), # 40, 40, 40 is equal to 3 Hidden Layers
+                maxit = 50, learnFunc = "Std_Backpropagation") # with 50 iterations and standard backpropagation
 time.end <- Sys.time()
 
 print(time.end-time.start)
-
 
 ##### Exercise 5.1.3 #####
 #Evaluation of the Neural network
