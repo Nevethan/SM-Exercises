@@ -46,7 +46,7 @@ kmeansData
 
 ####################### Pre Processing ############################
 
-result <- getAllPersonsInData(folder, 2, 70)
+result <- getAllPersonsInData(folder, 1, 50)
 
 ##### No Pre Processing #####
 
@@ -64,14 +64,11 @@ kmeansData <- result
 
 ##### CV On noPreProcessingData #####
 
-crossValidation(noPreProcessingData, 10, 5)
-
-
-
+np.cv.results <- crossValidation(noPreProcessingData, 10, 20)
 
 #plot the speed.cross and accuracy_cross
-plot(K, noPreProcessing.timeList.mean, xlab = "Number of K", ylab = "time (seconds)")
-plot(K, noPreProcessing.accuracyList.mean, xlab = "Number of K", ylab = "Accuracy")
+plot(1:20, np.cv.results$time, xlab = "Number of K", ylab = "time (seconds)")
+plot(1:20, np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy")
 
 ##### CV On pcaData #####
 
