@@ -3,7 +3,7 @@ library("gmodels")
 
 #source('C:/Users/Bruger/Desktop/SM-Exercises/loadImage.R', echo=TRUE) #This contains Smoothing override method
 #source('C:/Users/Bruger/Desktop/Statistical Mashine Learning/BaseFolder/loadImage.R')
-source('C:/Users/Anna/svn/new/trunk/BaseFolder/loadImage.R')
+source('loadImage.R')
 source('Methods.R')
 
 #directory <- 'C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group';
@@ -81,7 +81,6 @@ getAllPersonsInData <- function(folder, persons, split) {
                      list( 1, 2 ), list( 1, 4, 2, 3 ), list( 1, 4, 2, 3 ), list( 1, 2, 3 ))  
   
   idList <- getAllData(datalist, folder, persons)
-  View(idList)
   id <- data.frame()
   for(i in 1:length(idList)){
     idTemp <- idList[i]
