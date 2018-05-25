@@ -3,7 +3,7 @@ library("gmodels")
 
 #source('C:/Users/Bruger/Desktop/SM-Exercises/loadImage.R', echo=TRUE) #This contains Smoothing override method
 #source('C:/Users/Bruger/Desktop/Statistical Mashine Learning/BaseFolder/loadImage.R')
-source('C:/Users/Anna/svn/new/trunk/BaseFolder/loadImage.R')
+source('loadImage.R')
 source('Methods.R')
 
 #directory <- 'C:/Users/Bruger/Desktop/Statistical Mashine Learning/2018/group';
@@ -20,7 +20,7 @@ getAllData <- function(dataList, folder, persons){
         idTemp <- loadSinglePersonsData(100,i - 1, dataList[[i]][j], folder)
         idList <- append(idList, list(idTemp))
         index <- index+1
-        if (i == persons) {
+        if (index == persons) {
           return(idList)
         }
       }
@@ -81,7 +81,7 @@ getAllPersonsInData <- function(folder, persons, split) {
                      list( 1, 2 ), list( 1, 4, 2, 3 ), list( 1, 4, 2, 3 ), list( 1, 2, 3 ))  
   
   idList <- getAllData(datalist, folder, persons)
-  View(idList)
+
   id <- data.frame()
   for(i in 1:length(idList)){
     idTemp <- idList[i]
@@ -123,12 +123,13 @@ getIndividualData <- function(folder, persons, split) {
                      list( 1, 2 ), list( 1, 4, 2, 3 ), list( 1, 4, 2, 3 ), list( 1, 2, 3 ))  
   
   #Data split
-  total_persons <- persons*4000
-  split_training <- total_persons*split/100
+  data_pr_person <- 4000
+  split_training <- data_pr_person*split/100
   train <- 1:split_training
-  test <- (split_training+1):total_persons
+  test <- (split_training+1):data_pr_person
   
   idList <- getAllData(datalist, folder, persons)
+
   id.train <- data.frame()
   id.test <- data.frame()
   for(i in 1:length(idList)){
@@ -151,7 +152,8 @@ getIndividualData <- function(folder, persons, split) {
   dataset.test.labels <- factor(temp.test[,1])
   dataset.train <- temp.train[,-1]
   dataset.test <- temp.test[,-1]
-  
+
   return(list("train" = dataset.train, "test" = dataset.test, "train.labels" = dataset.train.labels, "test.labels" = dataset.test.labels))
   
 }
+
