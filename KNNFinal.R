@@ -44,19 +44,38 @@ plot(1:KNN.k, i.np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy")
 
 ########################## Parameter Tuning ######################
 
+
+
+
+
+
+
+
+
+
+
+
+
 ###################################################################
 ######################### All Persons In ########################## 
 ###################################################################
 
 ####################### Pre Processing ############################
-a.result <- getAllPersonsInData(folder, 5, 70)
+a.result <- getAllPersonsInData(folder, 20, 70)
 
 ##### No Pre Processing #####
-
 a.noPreProcessingData <- a.result
 
 ##### PCA #####
 a.pcaData <- a.result
+
+a.pca.obj <- prcomp(a.pcaData$train)
+
+#Get train and test data from PCA object
+a.train.pca <- a.pca.obj$x #x = scores vector
+a.test.pca <- predict(a.pca.obj, a.pcaData$test) #Finding Principle Components in test
+
+
 
 ##### K-Means #####
 a.kmeansData <- a.result
@@ -73,6 +92,8 @@ plot(1:KNN.k, a.np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy")
 
 ##### CV On pcaData #####
 
+
+
 ##### K-Means On pcaData #####
 
 ########################## Apply KNN ##############################
@@ -81,18 +102,44 @@ plot(1:KNN.k, a.np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy")
 set.seed(1234)
 
 time.start <- Sys.time() 
-model <- knn(result$train, result$test, result$train.labels, 1)
+a.knn.model <- knn(result$train, result$test, result$train.labels, 1)
 time.end <- Sys.time()
 
 print(time.end-time.start)
 
-acc(model, result$test.labels)
+acc(a.knn.model, result$test.labels)
 
 ##### KNN On pcaData #####
+
+a.numberOfPCs <- 1:20
+
+a.time.start <- Sys.time()
+a.pca.model <- knn(a.train.pca[, a.numberOfPCs], a.test.pca[, a.numberOfPCs],a.pcaData$train.labels,5)
+a.time.end <- Sys.time()
+
+#Run time
+print(a.time.end - a.time.start)
+
+#Performance
+acc(a.pca.model, a.pcaData$test.labels)
 
 ##### KNN On kmeansData #####
 
 ########################## Parameter Tuning ######################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ###################################################################
 ############################ Disjunct ############################# 
@@ -126,6 +173,13 @@ d.kmeansData
 ##### KNN On kmeansData #####
 
 ########################## Parameter Tuning ######################
+
+
+
+
+
+
+
 
 
 
