@@ -4,26 +4,31 @@ source("dataLoading.R")
 folder <- "../../SML_Data/preProcessed/2018/group"
 
 
-
-
 ###################################################################
 ######################### Individual Data ######################### 
 ###################################################################
 
 ####################### Pre Processing ############################
+i.result <- getIndividualData(folder, 5, 70)
 
 ##### No Pre Processing #####
-noPreProcessingData <- result
+i.noPreProcessingData <- i.result
 
 ##### PCA #####
-pcaData
+i.pcaData
 
 ##### K-Means #####
-kmeansData
+i.kmeansData
 
 ##################### Cross Validation ############################
 
 ##### CV On noPreProcessingData #####
+KNN.k = 20
+i.np.cv.results <- crossValidation(noPreProcessingData, 10, KNN.k)
+
+#plot the speed.cross and accuracy_cross
+plot(1:KNN.k, i.np.cv.results$time, xlab = "Number of K", ylab = "time (seconds)")
+plot(1:KNN.k, i.np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy")
 
 ##### CV On pcaData #####
 
@@ -43,32 +48,28 @@ kmeansData
 ######################### All Persons In ########################## 
 ###################################################################
 
-
 ####################### Pre Processing ############################
-
-result <- getAllPersonsInData(folder, 1, 50)
+a.result <- getAllPersonsInData(folder, 5, 70)
 
 ##### No Pre Processing #####
 
-noPreProcessingData <- result
+a.noPreProcessingData <- a.result
 
 ##### PCA #####
-pcaData <- result
+a.pcaData <- a.result
 
 ##### K-Means #####
-kmeansData <- result
+a.kmeansData <- a.result
 
 ##################### Cross Validation ############################
 
-
-
 ##### CV On noPreProcessingData #####
-
-np.cv.results <- crossValidation(noPreProcessingData, 10, 20)
+KNN.k = 20
+a.np.cv.results <- crossValidation(a.noPreProcessingData, 10, KNN.k)
 
 #plot the speed.cross and accuracy_cross
-plot(1:20, np.cv.results$time, xlab = "Number of K", ylab = "time (seconds)")
-plot(1:20, np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy")
+plot(1:KNN.k, a.np.cv.results$time, xlab = "Number of K", ylab = "time (seconds)")
+plot(1:KNN.k, a.np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy")
 
 ##### CV On pcaData #####
 
@@ -96,17 +97,17 @@ acc(model, result$test.labels)
 ###################################################################
 ############################ Disjunct ############################# 
 ###################################################################
-
+d.result <- getDisjunctData(folder, 5, 70)
 ####################### Pre Processing ############################
 
 ##### No Pre Processing #####
-noPreProcessingData <- result
+d.noPreProcessingData <- d.result
 
 ##### PCA #####
-pcaData
+d.pcaData
 
 ##### K-Means #####
-kmeansData
+d.kmeansData
 
 ##################### Cross Validation ############################
 
