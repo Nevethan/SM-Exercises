@@ -1,7 +1,7 @@
 #-------------------------------------------------------------
 #load libraries
 #-------------------------------------------------------------
-library("png")
+#library("png")
 library("jpeg")
 library("EBImage")
 library("class")
@@ -13,6 +13,7 @@ library("caret")
 #library("RSNNS")
 #install.packages("neuralnet")
 
+rotateSelf <- function(x) t(apply(x, 2, rev))
 
 #This file contains 2 functions and some example code in the bottom
 #for using the 2 functions.
@@ -79,12 +80,6 @@ smoothImage <- function(grayImg){
   return(smoothed)
 }
 
-smoothImageOverride <- function(grayImg, sigma){
-  picture <- gblur(grayImg, sigma)
-  
-  return(picture)
-}
-
 
 #-------------------------------------------------------------
 #Data loading function.
@@ -102,17 +97,17 @@ smoothImageOverride <- function(grayImg, sigma){
 loadSinglePersonsData <- function(DPI,groupNr,groupMemberNr,folder){
   #load the scaned images
 
-   # ciffers <- list(readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-0.png"), collapse = "")),
-   #                  readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-1.png"), collapse = "")),
-   #                  readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-2.png"), collapse = "")),
-   #                  readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-3.png"), collapse = "")),
-   #                  readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-4.png"), collapse = "")))
-
-   ciffers <- list(readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-0.jpeg"), collapse = "")),
-                   readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-1.jpeg"), collapse = "")),
-                   readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-2.jpeg"), collapse = "")),
-                   readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-3.jpeg"), collapse = "")),
-                   readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-4.jpeg"), collapse = "")))
+  # ciffers <- list(readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-0.png"), collapse = "")),
+  #                 readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-1.png"), collapse = "")),
+  #                 readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-2.png"), collapse = "")),
+  #                 readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-3.png"), collapse = "")),
+  #                 readPNG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-4.png"), collapse = "")))
+  
+  ciffers <- list(readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-0.jpeg"), collapse = "")),
+                  readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-1.jpeg"), collapse = "")),
+                  readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-2.jpeg"), collapse = "")),
+                  readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-3.jpeg"), collapse = "")),
+                  readJPEG(paste(c(folder,groupNr,"/member",groupMemberNr,"/Ciphers",DPI,"-4.jpeg"), collapse = "")))
   
   #load the corner values
   corners <- read.csv(paste(c(folder,groupNr,"/member",groupMemberNr,"/Corners.txt"), collapse = ""))
@@ -124,6 +119,9 @@ loadSinglePersonsData <- function(DPI,groupNr,groupMemberNr,folder){
   #   smoothed <- list(1:5)
   prepared <- list(1:5)
 
+
+  
+  
   #convert the images to gray scale.
   for(i in 1:5)
   {
@@ -141,8 +139,19 @@ loadSinglePersonsData <- function(DPI,groupNr,groupMemberNr,folder){
   for(i in 1:5)
   {
     prepared[[i]] <- smoothImage(prepared[[i]])
-    #prepared[[i]] <- smoothImageOverride(prepared[[i]], sigma) #Override method for smoothing pictures. Define the sigma your self.
   }  
+  
+  # Rotate image to correct orientation
+  for( i in 1:5){
+    if( dim(prepared[[i]])[2] > dim(prepared[[i]])[1] ){  
+      prepared[[i]] <- rotateSelf(prepared[[i]]) #   EBImage::rotate(prepared[[i]])
+    }
+  }
+  
+  
+#  for( i in 1:5){
+#    image(prepared[[i]])
+#  }
   
   #extract individual ciffers
   #xStep and yStep is used to ensure the first corner of the
