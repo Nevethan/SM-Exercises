@@ -61,7 +61,7 @@ plot(1:KNN.k, i.np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy")
 ###################################################################
 
 ####################### Pre Processing ############################
-a.result <- getAllPersonsInData(folder, 20, 70)
+a.result <- getAllPersonsInData(folder, 1, 70)
 
 ##### No Pre Processing #####
 a.noPreProcessingData <- a.result
@@ -88,7 +88,11 @@ a.np.cv.results <- crossValidation(a.noPreProcessingData, 10, KNN.k)
 
 #plot the speed.cross and accuracy_cross
 plot(1:KNN.k, a.np.cv.results$time, xlab = "Number of K", ylab = "time (seconds)")
-plot(1:KNN.k, a.np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy")
+plot(1:KNN.k, a.np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy", ylim = c(99.3, 100))
+points(1:KNN.k, a.np.cv.results$test, col= c("red"))
+lines(1:KNN.k, a.np.cv.results$test, col= c("red"))
+lines(1:KNN.k, a.np.cv.results$accuracy, col= c("black"))
+
 
 ##### CV On pcaData #####
 
@@ -102,7 +106,7 @@ plot(1:KNN.k, a.np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy")
 set.seed(1234)
 
 time.start <- Sys.time() 
-a.knn.model <- knn(result$train, result$test, result$train.labels, 1)
+a.knn.model <- knn(result$train, result$test, result$train.labels, 3)
 time.end <- Sys.time()
 
 print(time.end-time.start)
@@ -113,12 +117,12 @@ acc(a.knn.model, result$test.labels)
 
 a.numberOfPCs <- 1:20
 
-a.time.start <- Sys.time()
+time.start <- Sys.time()
 a.pca.model <- knn(a.train.pca[, a.numberOfPCs], a.test.pca[, a.numberOfPCs],a.pcaData$train.labels,5)
-a.time.end <- Sys.time()
+time.end <- Sys.time()
 
 #Run time
-print(a.time.end - a.time.start)
+print(time.end - time.start)
 
 #Performance
 acc(a.pca.model, a.pcaData$test.labels)
@@ -192,6 +196,8 @@ crossValidation <- function(data, f, k) {
   timeList <- list()
   timeList.mean <- list()
   
+  testAccuracy <- list()
+  
   K <- 1:k
   folds <- createFolds(data$train.labels, f)
   
@@ -218,10 +224,13 @@ crossValidation <- function(data, f, k) {
     timeList.mean[i] <- mean(timeList)
     accuracyList.mean[i] <- mean(accuracyList)
     
+    t.model <- knn(data$train, data$test, data$train.labels,i)
+    testAccuracy[i] <- acc(t.model, data$test.labels)
+    
     accuracyList <- 0
     timeList <- 0
     
   }
   
-  return(list("accuracy" = accuracyList.mean, "time" = timeList.mean))
+  return(list("accuracy" = accuracyList.mean, "time" = timeList.mean, "test"=testAccuracy))
 }
