@@ -1,28 +1,24 @@
 
 source("dataLoading.R")
 
-folder <- "../../SML_Data/preProcessed/2018/group"
+folder <- "../../StatisticML/preProcessed/2018/group"
 
 
-###################################################################
 ######################### Individual Data ######################### 
-###################################################################
-
-####################### Pre Processing ############################
+#### [I] Pre Processing ####
 i.result <- getIndividualData(folder, 5, 70)
 
-##### No Pre Processing #####
+## No Pre Processing ##
 i.noPreProcessingData <- i.result
 
-##### PCA #####
+## PCA ##
 i.pcaData
 
-##### K-Means #####
+## K-Means ##
 i.kmeansData
 
-##################### Cross Validation ############################
-
-##### CV On noPreProcessingData #####
+#### [I] Cross Validation ####
+## CV On noPreProcessingData ##
 KNN.k = 20
 i.np.cv.results <- crossValidation(noPreProcessingData, 10, KNN.k)
 
@@ -30,43 +26,28 @@ i.np.cv.results <- crossValidation(noPreProcessingData, 10, KNN.k)
 plot(1:KNN.k, i.np.cv.results$time, xlab = "Number of K", ylab = "time (seconds)")
 plot(1:KNN.k, i.np.cv.results$accuracy, xlab = "Number of K", ylab = "Accuracy")
 
-##### CV On pcaData #####
+## CV On pcaData ##
 
-##### K-Means On pcaData #####
+## CV on K-Means ##
 
-########################## Apply KNN ##############################
+#### [I] Apply KNN ####
+## KNN on noPreProcessingData ##
 
-##### KNN on noPreProcessingData #####
+## KNN On pcaData ##
 
-##### KNN On pcaData #####
+## KNN On kmeansData ##
 
-##### KNN On kmeansData #####
-
-########################## Parameter Tuning ######################
-
+#### [I] Parameter Tuning #####
 
 
-
-
-
-
-
-
-
-
-
-
-###################################################################
 ######################### All Persons In ########################## 
-###################################################################
+#### [A] Pre Processing ####
+a.result <- getAllPersonsInData(folder, 2, 70)
 
-####################### Pre Processing ############################
-a.result <- getAllPersonsInData(folder, 1, 70)
-
-##### No Pre Processing #####
+## No Pre Processing ##
 a.noPreProcessingData <- a.result
 
-##### PCA #####
+## PCA ##
 a.pcaData <- a.result
 
 a.pca.obj <- prcomp(a.pcaData$train)
@@ -76,15 +57,21 @@ a.train.pca <- a.pca.obj$x #x = scores vector
 a.test.pca <- predict(a.pca.obj, a.pcaData$test) #Finding Principle Components in test
 
 
-
-##### K-Means #####
+## K-Means ##
 a.kmeansData <- a.result
 
-##################### Cross Validation ############################
 
-##### CV On noPreProcessingData #####
+#### [A] Cross Validation ####
+## CV On noPreProcessingData ##
 KNN.k = 20
+
+time.start <- Sys.time() 
+
 a.np.cv.results <- crossValidation(a.noPreProcessingData, 10, KNN.k)
+
+time.end <- Sys.time()
+
+print(time.end-time.start)
 
 #plot the speed.cross and accuracy_cross
 plot(1:KNN.k, a.np.cv.results$time, xlab = "Number of K", ylab = "time (seconds)")
@@ -94,15 +81,14 @@ lines(1:KNN.k, a.np.cv.results$test, col= c("red"))
 lines(1:KNN.k, a.np.cv.results$accuracy, col= c("black"))
 
 
-##### CV On pcaData #####
+## CV On pcaData ##
+
+## CV On K-Means ##
 
 
+#### [A] Apply KNN ####
 
-##### K-Means On pcaData #####
-
-########################## Apply KNN ##############################
-
-##### KNN on noPreProcessingData #####
+## KNN on noPreProcessingData ##
 set.seed(1234)
 
 time.start <- Sys.time() 
@@ -113,7 +99,7 @@ print(time.end-time.start)
 
 acc(a.knn.model, result$test.labels)
 
-##### KNN On pcaData #####
+## KNN On pcaData ##
 
 a.numberOfPCs <- 1:20
 
@@ -127,68 +113,44 @@ print(time.end - time.start)
 #Performance
 acc(a.pca.model, a.pcaData$test.labels)
 
-##### KNN On kmeansData #####
+## KNN On kmeansData ##
 
-########################## Parameter Tuning ######################
-
-
+#### [A] Parameter Tuning ####
 
 
 
 
 
-
-
-
-
-
-
-
-
-###################################################################
 ############################ Disjunct ############################# 
-###################################################################
+#### [D] Disjunct Pre Processing ####
 d.result <- getDisjunctData(folder, 5, 70)
-####################### Pre Processing ############################
-
-##### No Pre Processing #####
+## No Pre Processing ##
 d.noPreProcessingData <- d.result
 
-##### PCA #####
+## PCA ##
 d.pcaData
 
-##### K-Means #####
+## K-Means ##
 d.kmeansData
 
-##################### Cross Validation ############################
+#### [D] Cross Validation ####
+## CV On noPreProcessingData ##
 
-##### CV On noPreProcessingData #####
+## CV On pcaData ##
 
-##### CV On pcaData #####
+## CV On K-Means ##
 
-##### K-Means On pcaData #####
+#### [D] Apply KNN ####
+## KNN on noPreProcessingData ##
 
-########################## Apply KNN ##############################
+# KNN On pcaData ##
 
-##### KNN on noPreProcessingData #####
+## KNN On kmeansData ##
 
-##### KNN On pcaData #####
-
-##### KNN On kmeansData #####
-
-########################## Parameter Tuning ######################
+#### [D] Parameter Tuning ####
 
 
-
-
-
-
-
-
-
-
-
-##################################### Helper Methods ##########################
+##################### Helper Methods ##############################
 
 crossValidation <- function(data, f, k) {
   accuracyList <- list()
@@ -231,6 +193,5 @@ crossValidation <- function(data, f, k) {
     timeList <- 0
     
   }
-  
   return(list("accuracy" = accuracyList.mean, "time" = timeList.mean, "test"=testAccuracy))
 }
