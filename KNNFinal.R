@@ -24,7 +24,7 @@ i.kmeansData
 
 ##### CV On noPreProcessingData #####
 KNN.k = 20
-i.np.cv.results <- crossValidation(noPreProcessingData, 10, KNN.k)
+i.np.cv.results <- crossValidationNoPreProcessing(noPreProcessingData, 10, KNN.k)
 
 #plot the speed.cross and accuracy_cross
 plot(1:KNN.k, i.np.cv.results$time, xlab = "Number of K", ylab = "time (seconds)")
@@ -84,7 +84,7 @@ a.kmeansData <- a.result
 
 ##### CV On noPreProcessingData #####
 KNN.k = 20
-a.np.cv.results <- crossValidation(a.noPreProcessingData, 10, KNN.k)
+a.np.cv.results <- crossValidationNoPreProcessing(a.noPreProcessingData, 10, KNN.k)
 
 #plot the speed.cross and accuracy_cross
 plot(1:KNN.k, a.np.cv.results$time, xlab = "Number of K", ylab = "time (seconds)")
@@ -189,8 +189,56 @@ d.kmeansData
 
 
 ##################################### Helper Methods ##########################
+crossValidationPCA <- function(data, f, k, numberOfPCAs){
+  accuracyList <- list()
+  accuracyList.mean <- list()
+  timeList <- list()
+  timeList.mean <- list()
+  
+  testAccuracy <- list()
+  
+  K <- 1:k
+  folds <- createFolds(data$train.labels, f)
+  
+  for (i in K) {
+    for (j in 1:length(folds)) {
+      
+      cv.validation <- data$train[folds[[j]],]
+      cv.train <- data$train[-folds[[j]],]
+      
+      cv.train.labels <- data$train.labels[-folds[[j]]]
+      cv.validation.labels <- data$train.labels[folds[[j]]]
+      
+      time.start <- Sys.time()
+      model <- knn(cv.train, cv.validation, cv.train.labels,i)
+      time.end <- Sys.time()
+      
+      time.taken <- time.end - time.start
+      
+      timeList[j] <- time.taken
+      accuracyList[j] <- acc(model, cv.validation.labels)
+      
+    }
+    
+    timeList.mean[i] <- mean(timeList)
+    accuracyList.mean[i] <- mean(accuracyList)
+    
+    t.model <- knn(data$train, data$test, data$train.labels,i)
+    testAccuracy[i] <- acc(t.model, data$test.labels)
+    
+    accuracyList <- 0
+    timeList <- 0
+    
+  }
+  
+  return(list("accuracy" = accuracyList.mean, "time" = timeList.mean, "test"=testAccuracy))
+}
 
-crossValidation <- function(data, f, k) {
+  
+}
+
+
+crossValidationNoPreProcessing <- function(data, f, k) {
   accuracyList <- list()
   accuracyList.mean <- list()
   timeList <- list()
