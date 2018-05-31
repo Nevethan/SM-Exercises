@@ -175,8 +175,9 @@ points(its, n.val.acc.3, col = colors[6], type = "p")
 points(its, n.val.acc.3, col = colors[6], type = "l")
 
 # Change x, y to match the plot
-legend(16, 0.6, legend=c("Training", "Validation"),
-       col=c("blue", "red"), lty=1, cex=0.8)
+legend(17.3, 0.57, legend=c("Training N=50","Training N=100","Training N=150",
+                            "Validation N=50","Validation N=100","Validation N=150"),
+       col=c("blue", "purple", "cyan", "red", "orange", "darkgreen"), lty=1, cex=0.5)
 
 #### [lr] Tune Learning Rate ####
 # Variables
@@ -243,13 +244,10 @@ points(its, lr.val.acc.2, col = "orange", type = "l")
 points(its, lr.val.acc.3, col = "darkgreen", type = "p")
 points(its, lr.val.acc.3, col = "darkgreen", type = "l")
 
-#colors <- c("red", "green", "blue", "yellow", "brown", "black", "orange", "purple", "pink",
- #           "cyan", "darkgreen", "seagreen", "plum")
-
 # Change x, y to match the plot
 legend(17.3, 0.57, legend=c("Training LR=0.2","Training LR=0.1","Training LR=0.05",
                          "Validation LR= 0.2","Validation LR= 0.1","Validation LR= 0.05"),
-       col=c("blue", "red"), lty=1, cex=0.5)
+       col=c("blue", "purple", "cyan", "red", "orange", "darkgreen"), lty=1, cex=0.5)
 #### [hl] Tune on Hidden Layers ####
 # Variables
 its <- c(10,20) ## Iterations
