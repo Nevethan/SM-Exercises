@@ -23,7 +23,7 @@ getAllData <- function(dataList){
   return(idList)
 }
 
-folder <- "../StatisticML/preProcessed/2018/group"
+folder <- "../../SML_Data/preProcessed/2018/group"
 
 datalist <- list(  list( 1) ,list( 1, 2 ), list( 1, 2, 3 ),   list( 1, 2, 3 ), list( 1, 0, 4, 2, 3 ), 
                    list( 1, 5, 4, 2, 3 ), list( 0, 2, 3 ), list( 1 ), list( 1, 2, 3 ), list( 1, 2, 3 ), 
@@ -180,10 +180,10 @@ legend(16, 0.6, legend=c("Training", "Validation"),
 
 #### [lr] Tune Learning Rate ####
 # Variables
-its <- c(10,20, 30, 40, 50, 60, 70, 80, 90, 100) ## Iterations
+its <- c(10,20) ## Iterations
 
 # Change to the neuron amount that was best from previous case
-neuron <- 150  
+neuron <- 20  
 # Training Data
 
 lr <- 0.2
@@ -204,48 +204,52 @@ lr.train.time.3 <- lr.trainedModels.train$timeList
 
 # Validation Data
 lr <- 0.2
-lr.trainedModels.validation <- trainModel(ns, lr, neuron, dataset.validation, dataset.validation.labels)
+lr.trainedModels.validation <- trainModel(its, lr, neuron, dataset.validation, dataset.validation.labels)
 lr.val.acc.1 <- lr.trainedModels.validation$accuracyList
 lr.val.time.2 <- lr.trainedModels.validation$timeList
 
 lr <- 0.1
-lr.trainedModels.validation <- trainModel(ns, lr, neuron, dataset.validation, dataset.validation.labels)
+lr.trainedModels.validation <- trainModel(its, lr, neuron, dataset.validation, dataset.validation.labels)
 lr.val.acc.2 <- lr.trainedModels.validation$accuracyList
 lr.val.time.2 <- lr.trainedModels.validation$timeList
 
 lr <- 0.05
-lr.trainedModels.validation <- trainModel(ns, lr, neuron, dataset.validation, dataset.validation.labels)
+lr.trainedModels.validation <- trainModel(its, lr, neuron, dataset.validation, dataset.validation.labels)
 lr.val.acc.3 <- lr.trainedModels.validation$accuracyList
 lr.val.time.3 <- lr.trainedModels.validation$timeList
 
 
 # Plot
-mainText <- paste("LR =", lr, " HL =", 3, " N =", neuron)
+mainText <- paste("HL =", 3, " N =", neuron)
 
 plot(main = mainText, its,lr.train.acc.1, xlab = "Iterations",
-     ylab = "Accuracy", col = colors[3], ylim=c(0.50,0.90), type = "p")
-points(its,lr.train.acc.1, col = colors[3], type = "l")
+     ylab = "Accuracy", col = "blue", ylim=c(0.30,0.80), type = "p")
+points(its,lr.train.acc.1, col = "blue", type = "l")
 
-points(its, lr.train.acc.2, col = colors[2], type = "p")
-points(its, lr.train.acc.2, col = colors[2], type = "l")
+points(its, lr.train.acc.2, col = "purple", type = "p")
+points(its, lr.train.acc.2, col = "purple", type = "l")
 
-points(its, lr.train.acc.3, col = colors[1], type = "p")
-points(its, lr.train.acc.3, col = colors[1], type = "l")
+points(its, lr.train.acc.3, col = "cyan", type = "p")
+points(its, lr.train.acc.3, col = "cyan", type = "l")
 
 axis(1, at=its, labels = its)
 
-points(its, lr.val.acc.1, col = colors[4], type = "p")
-points(its, lr.val.acc.1, col = colors[4], type = "l")
+points(its, lr.val.acc.1, col = "red", type = "p")
+points(its, lr.val.acc.1, col = "red", type = "l")
 
-points(its, lr.val.acc.2, col = colors[5], type = "p")
-points(its, lr.val.acc.2, col = colors[5], type = "l")
+points(its, lr.val.acc.2, col = "orange", type = "p")
+points(its, lr.val.acc.2, col = "orange", type = "l")
 
-points(its, lr.val.acc.3, col = colors[6], type = "p")
-points(its, lr.val.acc.3, col = colors[6], type = "l")
+points(its, lr.val.acc.3, col = "darkgreen", type = "p")
+points(its, lr.val.acc.3, col = "darkgreen", type = "l")
+
+#colors <- c("red", "green", "blue", "yellow", "brown", "black", "orange", "purple", "pink",
+ #           "cyan", "darkgreen", "seagreen", "plum")
 
 # Change x, y to match the plot
-legend(16, 0.6, legend=c("Training", "Validation"),
-       col=c("blue", "red"), lty=1, cex=0.8)
+legend(17.3, 0.57, legend=c("Training LR=0.2","Training LR=0.1","Training LR=0.05",
+                         "Validation LR= 0.2","Validation LR= 0.1","Validation LR= 0.05"),
+       col=c("blue", "red"), lty=1, cex=0.5)
 #### [hl] Tune on Hidden Layers ####
 # Variables
 its <- c(10,20) ## Iterations
@@ -279,17 +283,17 @@ hl.train.time.3 <- hl.trainedModels.train$timeList
 
 # Validation Data
 
-hl.trainedModels.validation <- trainModel(ns, lr, neuron, dataset.validation, dataset.validation.labels)
+hl.trainedModels.validation <- trainModel(its, lr, neuron, dataset.validation, dataset.validation.labels)
 hl.val.acc.1 <- hl.trainedModels.validation$accuracyList
 hl.val.time.2 <- hl.trainedModels.validation$timeList
 
 
-hl.trainedModels.validation <- trainModel(ns, lr, neuron, dataset.validation, dataset.validation.labels)
+hl.trainedModels.validation <- trainModel(its, lr, neuron, dataset.validation, dataset.validation.labels)
 hl.val.acc.2 <- hl.trainedModels.validation$accuracyList
 hl.val.time.2 <- hl.trainedModels.validation$timeList
 
 
-hl.trainedModels.validation <- trainModel(ns, lr, neuron, dataset.validation, dataset.validation.labels)
+hl.trainedModels.validation <- trainModel(its, lr, neuron, dataset.validation, dataset.validation.labels)
 hl.val.acc.3 <- hl.trainedModels.validation$accuracyList
 hl.val.time.3 <- hl.trainedModels.validation$timeList
 
