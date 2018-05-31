@@ -95,8 +95,8 @@ it.val.time.1 <- it.trainedModels.validation$timeList
 mainText <- paste("LR =", lr, " HL =", 3, " N =", neuron)
 
 plot(main = mainText, its,it.train.acc.1, xlab = "Iterations",
-     ylab = "Accuracy", col = colors[3], ylim=c(0.50,0.90), type = "p")
-points(its,it.train.acc.1, col = colors[3], type = "l")
+     ylab = "Accuracy", col = "blue", ylim=c(0.50,0.90), type = "p")
+points(its,it.train.acc.1, col = "blue", type = "l")
 
 axis(1, at=its, labels = its)
 points(its, it.val.acc.1, col = colors[1], type = "p")
@@ -154,25 +154,25 @@ n.val.time.3 <- n.trainedModels.validation$timeList
 mainText <- paste("LR =", lr, " HL =", 3, " N =", neuron)
 
 plot(main = mainText, its,n.train.acc.1, xlab = "Iterations",
-     ylab = "Accuracy", col = colors[3], ylim=c(0.50,0.90), type = "p")
-points(its,n.train.acc.1, col = colors[3], type = "l")
+     ylab = "Accuracy", col = "blue", ylim=c(0.50,0.90), type = "p")
+points(its,n.train.acc.1, col = "blue", type = "l")
 
-points(its, n.train.acc.2, col = colors[2], type = "p")
-points(its, n.train.acc.2, col = colors[2], type = "l")
+points(its, n.train.acc.2, col = "purple", type = "p")
+points(its, n.train.acc.2, col = "purple", type = "l")
 
-points(its, n.train.acc.3, col = colors[1], type = "p")
-points(its, n.train.acc.3, col = colors[1], type = "l")
+points(its, n.train.acc.3, col = "cyan", type = "p")
+points(its, n.train.acc.3, col = "cyan", type = "l")
 
 axis(1, at=its, labels = its)
 
-points(its, n.val.acc.1, col = colors[4], type = "p")
-points(its, n.val.acc.1, col = colors[4], type = "l")
+points(its, n.val.acc.1, col = "red", type = "p")
+points(its, n.val.acc.1, col = "red", type = "l")
 
-points(its, n.val.acc.2, col = colors[5], type = "p")
-points(its, n.val.acc.2, col = colors[5], type = "l")
+points(its, n.val.acc.2, col = "orange", type = "p")
+points(its, n.val.acc.2, col = "orange", type = "l")
 
-points(its, n.val.acc.3, col = colors[6], type = "p")
-points(its, n.val.acc.3, col = colors[6], type = "l")
+points(its, n.val.acc.3, col = "darkgreen", type = "p")
+points(its, n.val.acc.3, col = "darkgreen", type = "l")
 
 # Change x, y to match the plot
 legend(17.3, 0.57, legend=c("Training N=50","Training N=100","Training N=150",
@@ -297,32 +297,33 @@ hl.val.time.3 <- hl.trainedModels.validation$timeList
 
 
 # Plot
-mainText <- paste("LR =", lr, " HL =", 3, " N =", neuron)
+mainText <- paste("LR =", lr, " N =", neuron)
 
 plot(main = mainText, its,hl.train.acc.1, xlab = "Iterations",
-     ylab = "Accuracy", col = colors[3], ylim=c(0.50,0.90), type = "p")
-points(its,hl.train.acc.1, col = colors[3], type = "l")
+     ylab = "Accuracy", col = "blue", ylim=c(0.50,0.90), type = "p")
+points(its,hl.train.acc.1, col = "blue", type = "l")
 
-points(its, hl.train.acc.2, col = colors[2], type = "p")
-points(its, hl.train.acc.2, col = colors[2], type = "l")
+points(its, hl.train.acc.2, col = "purple", type = "p")
+points(its, hl.train.acc.2, col = "purple", type = "l")
 
-points(its, hl.train.acc.3, col = colors[1], type = "p")
-points(its, hl.train.acc.3, col = colors[1], type = "l")
+points(its, hl.train.acc.3, col = "cyan", type = "p")
+points(its, hl.train.acc.3, col = "cyan", type = "l")
 
 axis(1, at=its, labels = its)
 
-points(its, hl.val.acc.1, col = colors[4], type = "p")
-points(its, hl.val.acc.1, col = colors[4], type = "l")
+points(its, hl.val.acc.1, col = "red", type = "p")
+points(its, hl.val.acc.1, col = "red", type = "l")
 
-points(its, hl.val.acc.2, col = colors[5], type = "p")
-points(its, hl.val.acc.2, col = colors[5], type = "l")
+points(its, hl.val.acc.2, col = "orange", type = "p")
+points(its, hl.val.acc.2, col = "orange", type = "l")
 
-points(its, hl.val.acc.3, col = colors[6], type = "p")
-points(its, hl.val.acc.3, col = colors[6], type = "l")
+points(its, hl.val.acc.3, col = "darkgreen", type = "p")
+points(its, hl.val.acc.3, col = "darkgreen", type = "l")
 
 # Change x, y to match the plot
-legend(16, 0.6, legend=c("Training", "Validation"),
-       col=c("blue", "red"), lty=1, cex=0.8)
+legend(17.3, 0.57, legend=c("Training HL=3","Training HL=5","Training HL=7",
+                            "Validation HL=3","Validation HL=5","Validation HL=7"),
+       col=c("blue", "purple", "cyan", "red", "orange", "darkgreen"), lty=1, cex=0.5)
 
 #### [lf] Try different Learning Functions ####
 # Remove
@@ -330,22 +331,6 @@ legend(16, 0.6, legend=c("Training", "Validation"),
 # Remove
 
 ########################### Helper Methods ##############################
-
-## For plotting results
-plotResults <- function(hiddenLayers,xpos,ypos) {
-  mainText <- paste("LR =", lr, " HL =", hiddenLayers, " N =", neuron)
-  
-  plot(main = mainText, its,trainedModels.train$accuracyList, xlab = "Iterations",
-       ylab = "Accuracy", col = colors[3], ylim=c(0.50,0.90), type = "p")
-  points(its,trainedModels.train$accuracyList, col = colors[3], type = "l")
-  
-  axis(1, at=its, labels = its)
-  points(its,trainedModels.validation$accuracyList, col = colors[1], type = "p")
-  points(its,trainedModels.validation$accuracyList, col = colors[1], type = "l")
-  
-  legend(xpos, ypos, legend=c("Training", "Validation"),
-         col=c("blue", "red"), lty=1, cex=0.8)
-}
 
 ## Runs a model multiple times for each specificed iteration
 ## To change layers or learnFunc, do it manually in the function
